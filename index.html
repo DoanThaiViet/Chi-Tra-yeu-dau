@@ -483,7 +483,11 @@ const CONFIG = {
 
   // Video chạy theo cuộn ở hero. Để '' thì hero trình chiếu ảnh bên dưới.
   // Khi có video thật của lớp: 'video/hero.mp4'
-  heroVideo: '',
+  heroVideo: 'https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4',   // hoa nở (CC0)
+  // 'play'  : hết intro thì video tự phát chậm một lần rồi dừng ở khung cuối (mượt nhất)
+  // 'scrub' : video tua theo cuộn (cần mã hóa lại bằng ffmpeg -g 1, xem đầu file)
+  heroVideoMode: 'play',
+  heroVideoRate: 0.5,        // tốc độ phát: 0.5 = chậm một nửa
   // Ảnh trình chiếu ở hero: nên là ẢNH CÓ CHỊ (chân dung, chị cùng lớp...), ví dụ ['anh/chi-1.jpg', 'anh/chi-2.jpg']
   // Để trống [] thì hero là nền ánh sáng vàng đêm gala.
   heroFallback: [],
@@ -681,8 +685,10 @@ function tick(now) {
     ctx.clearRect(0, 0, W, H);
     const kb = lerp(1.14, 1.0, smooth);   // zoom chậm kiểu điện ảnh
     if (useVideo && vidDur) {
-      const tt = smooth * (vidDur - 0.05);
-      if (!vid.seeking && Math.abs(vid.currentTime - tt) > 0.03) vid.currentTime = tt;
+      if (CONFIG.heroVideoMode === 'scrub') {
+        const tt = smooth * (vidDur - 0.05);
+        if (!vid.seeking && Math.abs(vid.currentTime - tt) > 0.03) vid.currentTime = tt;
+      }
       drawCover(vid, vid.videoWidth, vid.videoHeight, kb);
     } else if (!fb.length) {
       drawGala(now, smooth);
@@ -904,6 +910,10 @@ function endIntro() {
   introOn = false; introT.forEach(clearTimeout);
   const it = $('#intro'); it.classList.add('out');
   setTimeout(() => { it.style.display = 'none'; burstOn = false; }, 1800);
+  if (CONFIG.heroVideo && CONFIG.heroVideoMode !== 'scrub') {   // hoa nở đúng lúc màn intro kéo lên
+    vid.currentTime = 0; vid.playbackRate = CONFIG.heroVideoRate || 1;
+    vid.play().catch(() => {});
+  }
   if (QUAY || CONFIG.autoStart) setTimeout(() => { if (!auto) setAuto(true); }, 3200);
 }
 $('#startBtn').onclick = start;

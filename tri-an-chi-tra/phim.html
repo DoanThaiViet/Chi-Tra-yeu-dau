@@ -1,0 +1,585 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Gửi Chị Trà</title>
+<!--
+  ================= PHIM TỰ CHẠY (KHÔNG CUỘN) =================
+  Mở trang → bấm nút phát → phim tự chạy từ đầu đến cuối (~2 phút).
+  Phím:  → / PageDown  cảnh tiếp     ← / PageUp  cảnh trước
+         Space  tạm dừng / chạy tiếp   F  toàn màn hình   M  nhạc   Home  chạy lại
+  Thêm ?quay=1 vào địa chỉ để quay màn hình (ẩn mọi chữ hướng dẫn).
+  Mọi ảnh / video / chữ thay trong khối CONFIG ở cuối file.
+  ============================================================
+-->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600&family=Dancing+Script:wght@500;600;700&family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400;1,500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0b0805;
+  --cream:#fbf7f0;
+  --ink:#f4ead8;
+  --ink-soft:#cbb99d;
+  --gold:#c89848;
+  --gold-hi:#e9c99a;
+  --serif:'Playfair Display',Georgia,serif;
+  --sans:'Be Vietnam Pro',system-ui,sans-serif;
+  --hand:'Dancing Script',cursive;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--ink);font-family:var(--sans);font-weight:300;-webkit-font-smoothing:antialiased}
+body.idle,body.idle *{cursor:none!important}
+
+/* ---------- nền video ---------- */
+#bgwrap{position:fixed;inset:0;overflow:hidden;background:radial-gradient(ellipse at 50% 60%,#3a2612,#0b0704 75%)}
+#bg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;animation:drift 70s ease-in-out infinite alternate}
+@keyframes drift{from{transform:scale(1.02)}to{transform:scale(1.16) translate(-1.5%,-1%)}}
+#shade{position:fixed;inset:0;background:#0b0805;opacity:.3;transition:opacity 1.6s ease;pointer-events:none}
+#warm{position:fixed;inset:0;pointer-events:none;background:radial-gradient(ellipse at 75% 10%,rgba(255,210,150,.18),transparent 60%),radial-gradient(ellipse at center,transparent 50%,rgba(10,7,4,.55) 100%)}
+#fx{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:40}
+.grain{position:fixed;inset:0;pointer-events:none;z-index:45;opacity:.06;mix-blend-mode:screen;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='256' height='256'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
+.lbx{position:fixed;left:0;right:0;height:6vh;background:#000;z-index:44;pointer-events:none}
+.lbx.t{top:0}.lbx.b{bottom:0}
+
+/* ---------- cảnh ---------- */
+.scene{position:fixed;inset:0;z-index:20;opacity:0;visibility:hidden;transition:opacity 1.4s ease,visibility 1.4s}
+.scene.on{opacity:1;visibility:visible}
+.a{opacity:0;transform:translateY(34px);filter:blur(8px);transition:opacity 1.3s cubic-bezier(.2,.7,.2,1),transform 1.3s cubic-bezier(.2,.7,.2,1),filter 1.3s;transition-delay:calc(var(--d,0) * 1s)}
+.scene.on .a{opacity:1;transform:none;filter:none}
+.scene:not(.on) .a{transition-delay:0s;transition-duration:.7s}
+.over{font-size:clamp(10px,.8vw,14px);letter-spacing:.42em;text-transform:uppercase;color:var(--gold-hi);display:flex;align-items:center;gap:14px;margin-bottom:18px}
+.over:before{content:"";width:34px;height:1px;background:var(--gold-hi)}
+.center .over{justify-content:center}.center .over:after{content:"";width:34px;height:1px;background:var(--gold-hi)}
+h2{font-family:var(--serif);font-weight:400;line-height:1.02;letter-spacing:-.015em}
+h2 em{font-style:italic;color:#f1d4a8}
+.shimmer{background:linear-gradient(100deg,#8a5a24 0%,#c89848 22%,#f6e2b8 40%,#fff7e4 48%,#d9a95f 58%,#8a5a24 80%,#c89848 100%);background-size:260% 100%;-webkit-background-clip:text;background-clip:text;color:transparent!important;animation:shim 5s linear infinite;padding:0 .1em .14em}
+@keyframes shim{from{background-position:100% 0}to{background-position:-160% 0}}
+.left{position:absolute;left:8vw;top:50%;transform:translateY(-50%);width:min(900px,84vw)}
+.center{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:min(1100px,88vw);text-align:center}
+p.lead{margin-top:22px;font-size:clamp(15px,1.25vw,22px);line-height:1.65;color:rgba(251,247,240,.85);max-width:640px}
+.center p.lead{margin-left:auto;margin-right:auto}
+
+/* tên */
+.s-name h2{font-size:clamp(56px,7.6vw,140px)}
+.s-name .ch{display:inline-block;opacity:0;transform:translateY(.4em) rotate(4deg);filter:blur(6px);transition:all .9s cubic-bezier(.2,.7,.2,1)}
+.s-name.on .ch{opacity:1;transform:none;filter:none}
+.s-name .fade{position:absolute;inset:0;background:linear-gradient(90deg,rgba(11,8,5,.7),rgba(11,8,5,.1) 60%,transparent)}
+
+/* trích dẫn */
+.s-quote .mark{font-family:var(--serif);font-size:clamp(120px,12vw,220px);line-height:.5;color:var(--gold-hi);opacity:.6;height:.42em}
+.s-quote blockquote{font-family:var(--serif);font-style:italic;font-size:clamp(30px,3.4vw,60px);line-height:1.25;color:var(--cream)}
+.s-quote .by{margin-top:30px;font-size:clamp(11px,.85vw,14px);letter-spacing:.3em;text-transform:uppercase;color:rgba(251,247,240,.7)}
+
+/* con số */
+.s-stats h2{font-size:clamp(40px,4.6vw,84px)}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);margin-top:6vh;border-top:1px solid rgba(233,201,154,.25);border-bottom:1px solid rgba(233,201,154,.25)}
+.stats div{padding:4vh 1vw;border-right:1px solid rgba(233,201,154,.18)}
+.stats div:last-child{border-right:0}
+.stats b{display:block;font-family:var(--serif);font-weight:400;font-size:clamp(52px,6vw,112px);line-height:1;color:var(--cream)}
+.stats span{display:block;margin-top:12px;font-size:clamp(12px,.95vw,16px);letter-spacing:.08em;color:var(--ink-soft)}
+
+/* bài học */
+.s-lessons h2{font-size:clamp(44px,5vw,92px)}
+.gifts{list-style:none;margin-top:4vh;max-width:760px}
+.gifts li{display:flex;gap:22px;align-items:baseline;padding:2.2vh 0;border-top:1px solid rgba(251,247,240,.15);font-size:clamp(17px,1.5vw,26px);color:rgba(251,247,240,.9)}
+.gifts li b{font-family:var(--serif);font-weight:400;font-style:italic;color:var(--gold-hi);font-size:1.15em;min-width:40px}
+
+/* mốc thời gian: ảnh toàn màn hình */
+.ph{position:absolute;inset:-5%;background:center/cover no-repeat;transform:scale(1.18);transition:transform 10s linear;filter:saturate(.9) contrast(1.03)}
+.scene.on .ph{transform:scale(1.03) translateX(-2%)}
+.s-tl .fade{position:absolute;inset:0;background:linear-gradient(90deg,rgba(11,8,5,.92) 0%,rgba(11,8,5,.7) 38%,rgba(11,8,5,.1) 72%),linear-gradient(0deg,rgba(11,8,5,.6),transparent 40%)}
+.s-tl .yr{font-family:var(--serif);font-style:italic;font-size:clamp(70px,8vw,150px);line-height:1;color:var(--gold-hi)}
+.s-tl h2{font-size:clamp(36px,3.6vw,64px);margin-top:10px}
+.s-tl .cap{position:absolute;right:6vw;bottom:9vh;font-family:var(--hand);font-size:clamp(22px,2vw,34px);color:rgba(251,247,240,.8)}
+
+/* album */
+.s-album .head{position:absolute;left:0;right:0;top:9vh;text-align:center}
+.s-album h2{font-size:clamp(40px,4.4vw,80px)}
+.album{position:absolute;left:6vw;right:6vw;top:27vh;bottom:9vh;display:grid;grid-template-columns:repeat(4,1fr);grid-template-rows:1fr 1fr;gap:2.4vw}
+.polaroid{position:relative;background:var(--cream);padding:.7vw .7vw 3.2vw;box-shadow:0 26px 50px -20px rgba(0,0,0,.7);transform:rotate(var(--rot,0deg))}
+.polaroid .im{width:100%;height:100%;background:center/cover;filter:sepia(.15) saturate(.92)}
+.polaroid figcaption{position:absolute;left:0;right:0;bottom:.7vw;text-align:center;font-family:var(--hand);font-size:clamp(14px,1.25vw,22px);color:#6b5a48;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding:0 8px}
+.album .a{transform:translateY(60px) rotate(calc(var(--rot,0deg) * 3)) scale(.9)}
+.scene.on .album .a{transform:rotate(var(--rot,0deg))}
+
+/* lá thư */
+.s-letter .wrap{position:absolute;inset:0;display:grid;grid-template-columns:1fr 1.35fr;gap:5vw;align-items:center;padding:0 8vw}
+.s-letter h2{font-size:clamp(44px,4.6vw,86px)}
+.letter{position:relative;background:var(--cream);padding:clamp(30px,3.6vw,64px);border-radius:4px;box-shadow:0 40px 90px -30px rgba(0,0,0,.8);
+  background-image:repeating-linear-gradient(transparent 0 calc(var(--lh) - 1px),rgba(176,122,58,.14) calc(var(--lh) - 1px) var(--lh));background-position:0 calc(var(--lh) * .7);--lh:clamp(36px,3.1vw,54px)}
+.letter:before{content:"";position:absolute;left:clamp(18px,2.2vw,40px);top:0;bottom:0;width:1px;background:rgba(196,134,122,.35)}
+.letter .line{font-family:var(--hand);font-size:clamp(19px,1.7vw,30px);line-height:var(--lh);color:#3a2c20;clip-path:inset(0 100% 0 0);transition:clip-path 1.8s cubic-bezier(.6,.1,.3,1);transition-delay:calc(var(--d,0) * 1s)}
+.scene.on .letter .line{clip-path:inset(0 0 0 0)}
+.letter .sign{margin-top:14px;text-align:right;font-family:var(--hand);font-size:clamp(26px,2.4vw,42px);color:var(--gold)}
+
+/* video kỷ niệm */
+.s-video{background:#000}
+.s-video video{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;background:#000}
+
+/* lời nhắn */
+.s-notes .head{position:absolute;left:0;right:0;top:9vh;text-align:center}
+.s-notes h2{font-size:clamp(40px,4.4vw,80px)}
+.notes{position:absolute;left:8vw;right:8vw;top:28vh;bottom:10vh;display:grid;grid-template-columns:repeat(3,1fr);grid-template-rows:1fr 1fr;gap:2.6vw}
+.note{position:relative;background:var(--cream);padding:2.4vw 2vw 1.8vw;border-radius:3px;box-shadow:0 22px 44px -22px rgba(0,0,0,.7);display:flex;flex-direction:column;justify-content:space-between}
+.note:before{content:"";position:absolute;top:-10px;left:50%;width:30%;height:22px;transform:translateX(-50%) rotate(-3deg);background:rgba(200,152,72,.35)}
+.note p{font-family:var(--hand);font-size:clamp(18px,1.6vw,30px);line-height:1.3;color:#3a2c20}
+.note .who{margin-top:12px;font-size:clamp(10px,.8vw,13px);letter-spacing:.25em;text-transform:uppercase;color:#8f7d63}
+.note:nth-child(3n+2){background:#f6ead8}.note:nth-child(3n){background:#f3e4dc}
+.notes .a{transform:translateY(50px) rotate(calc(var(--rot,0deg) * 3))}
+.scene.on .notes .a{transform:rotate(var(--rot,0deg))}
+
+/* kết */
+.s-end h2{font-size:clamp(80px,11vw,210px);line-height:.95}
+.s-end .hand{margin-top:5vh;font-family:var(--hand);font-size:clamp(28px,2.8vw,50px);color:#e8b4a6}
+.s-end .sig{margin-top:6vh;font-size:clamp(10px,.8vw,13px);letter-spacing:.4em;text-transform:uppercase;color:var(--ink-soft)}
+
+/* ---------- loader / intro / điều khiển ---------- */
+#loader{position:fixed;inset:0;z-index:9999;background:radial-gradient(ellipse at 50% 55%,#2a1c10,#0b0805 70%);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:22px;transition:opacity 1s,visibility 1s}
+#loader.done{opacity:0;visibility:hidden}
+#loader .mark{font-family:var(--hand);font-size:56px;color:var(--cream)}
+#loader .pct{font-size:10px;letter-spacing:.35em;color:rgba(251,247,240,.45)}
+#loader button{all:unset;cursor:pointer;position:relative;width:96px;height:96px;border-radius:50%;border:1px solid var(--gold-hi);display:none;place-items:center}
+#loader.ready button{display:grid}#loader.ready .pct{display:none}
+#loader button:before{content:"";position:absolute;inset:-12px;border-radius:50%;border:1px solid rgba(233,201,154,.45);animation:pulse 2.2s infinite}
+#loader button svg{width:26px;margin-left:5px;fill:var(--gold-hi)}
+#loader small{font-size:10px;letter-spacing:.32em;text-transform:uppercase;color:rgba(251,247,240,.5);display:none}
+#loader.ready small{display:block}
+@keyframes pulse{from{transform:scale(.9);opacity:1}to{transform:scale(1.5);opacity:0}}
+
+#intro{position:fixed;inset:0;z-index:9000;background:radial-gradient(ellipse at 50% 55%,#2a1c10,#0b0805 70%);display:none;flex-direction:column;align-items:center;justify-content:center;text-align:center;clip-path:inset(0 0 0 0);transition:clip-path 1.7s cubic-bezier(.76,0,.24,1)}
+#intro.play{display:flex}
+#intro.out{clip-path:inset(0 0 100% 0)}
+#burst{position:absolute;inset:0;width:100%;height:100%}
+#intro > *:not(canvas){position:relative}
+.i-line{width:0;height:1px;background:linear-gradient(90deg,transparent,var(--gold-hi),transparent)}
+.play .i-line{animation:iline 1.4s .3s cubic-bezier(.6,0,.2,1) forwards}
+@keyframes iline{to{width:min(70vw,900px)}}
+.i-date{margin:30px 0 4px;font-size:clamp(11px,1vw,16px);letter-spacing:.55em;text-transform:uppercase;color:var(--gold-hi);opacity:0}
+.play .i-date{animation:ifade 1.2s 1s forwards}
+.i-title{font-family:var(--serif);font-weight:400;line-height:.88;display:flex;flex-direction:column;align-items:center}
+.i-a{font-size:clamp(60px,8.5vw,160px);color:var(--cream);opacity:0;filter:blur(14px);transform:translateY(40px)}
+.play .i-a{animation:irise 1.6s 1.6s cubic-bezier(.2,.7,.2,1) forwards}
+.i-b{font-style:italic;font-size:clamp(130px,17vw,320px);line-height:1.1;margin-bottom:-.12em;opacity:0;transform:scale(1.3);filter:blur(24px)}
+.play .i-b{animation:izoom 2.2s 2.4s cubic-bezier(.2,.7,.2,1) forwards,shim 5s linear infinite}
+.i-sub{margin-top:8px;font-family:var(--hand);font-size:clamp(26px,2.6vw,48px);color:#f1d4a8;opacity:0}
+.play .i-sub{animation:ifade 1.4s 3.9s forwards}
+@keyframes ifade{to{opacity:1}}
+@keyframes irise{to{opacity:1;filter:none;transform:none}}
+@keyframes izoom{to{opacity:1;filter:none;transform:none}}
+
+#prog{position:fixed;left:0;bottom:0;height:2px;width:0;z-index:60;background:linear-gradient(90deg,var(--gold),#f1d4a8);transition:width .6s linear;box-shadow:0 0 12px rgba(233,201,154,.6)}
+#hud{position:fixed;left:50%;bottom:9vh;transform:translateX(-50%);z-index:60;display:flex;gap:18px;padding:10px 22px;border-radius:999px;background:rgba(20,14,8,.6);-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);color:rgba(251,247,240,.8);font-size:11px;letter-spacing:.1em;white-space:nowrap;transition:opacity .6s}
+#hud kbd{font:500 10px var(--sans);padding:2px 7px;border:1px solid rgba(251,247,240,.35);border-radius:5px;margin-right:6px}
+body.idle #hud{opacity:0}
+#pauseTag{position:fixed;top:8vh;right:3vw;z-index:60;font-size:10px;letter-spacing:.3em;color:var(--gold-hi);background:rgba(20,14,8,.6);padding:7px 14px;border-radius:999px;display:none}
+body.paused #pauseTag{display:block}
+#fin{position:fixed;inset:0;z-index:8000;background:#000;opacity:0;pointer-events:none;transition:opacity 3s}
+#fin.on{opacity:1}
+body.rec #hud,body.rec #pauseTag,body.rec #prog{display:none!important}
+body.rec,body.rec *{cursor:none!important}
+</style>
+</head>
+<body>
+
+<div id="bgwrap"><video id="bg" muted playsinline preload="auto"></video></div>
+<div id="shade"></div>
+<div id="warm"></div>
+
+<!-- ============ CÁC CẢNH (chạy theo thứ tự từ trên xuống) ============ -->
+<section class="scene s-name" data-dur="8" data-shade=".2">
+  <div class="fade"></div>
+  <div class="left" style="top:auto;bottom:16vh;transform:none;width:86vw">
+    <div class="over a">Kính gửi</div>
+    <h2 data-split data-name></h2>
+    <p class="lead a" style="--d:1.6">Phó Trưởng Ban Quản trị nguồn nhân lực Petrovietnam. Người đã đồng hành cùng 60 học viên khóa đầu tiên của chương trình “Lãnh đạo tương lai Petrovietnam”.</p>
+  </div>
+</section>
+
+<section class="scene s-quote" data-dur="8" data-shade=".62">
+  <div class="center">
+    <div class="mark a">“</div>
+    <blockquote class="a" style="--d:.4">Khi hiểu mình đang góp phần vào đâu, việc học không còn là yêu cầu, mà trở thành nhu cầu tự thân.</blockquote>
+    <div class="by a" style="--d:1.4">Chị chia sẻ sau hành trình Tây Nam Bộ · 3/2026</div>
+  </div>
+</section>
+
+<section class="scene s-stats" data-dur="8" data-shade=".7">
+  <div class="center">
+    <div class="over a">Khóa đầu tiên</div>
+    <h2 class="a" style="--d:.3">Một hành trình <em>cùng nhau</em></h2>
+    <div class="stats">
+      <div class="a" style="--d:.8"><b data-count="60">0</b><span>học viên xuất sắc toàn Tập đoàn</span></div>
+      <div class="a" style="--d:1.0"><b data-count="18">0</b><span>tháng đào tạo và phát triển</span></div>
+      <div class="a" style="--d:1.2"><b data-count="70" data-suffix="%">0</b><span>là trải nghiệm thực tế</span></div>
+      <div class="a" style="--d:1.4"><b data-count="1">0</b><span>người chị luôn ở bên lớp</span></div>
+    </div>
+  </div>
+</section>
+
+<section class="scene s-lessons" data-dur="9" data-shade=".66">
+  <div class="left">
+    <div class="over a">Điều chúng em học từ chị</div>
+    <h2 class="a" style="--d:.3">Những bài học <em>ngoài giáo trình</em></h2>
+    <ul class="gifts">
+      <li class="a" style="--d:1.0"><b>i.</b>Nhìn công việc của mình trong cả chuỗi giá trị năng lượng.</li>
+      <li class="a" style="--d:1.5"><b>ii.</b>Học vì chính mình muốn trưởng thành, không vì yêu cầu.</li>
+      <li class="a" style="--d:2.0"><b>iii.</b>Tận tâm với con người, với thế hệ kế cận của Petrovietnam.</li>
+    </ul>
+  </div>
+</section>
+
+<!-- các cảnh dòng thời gian được dựng từ CONFIG.timeline và chèn vào đây -->
+<div id="tlSlot"></div>
+
+<section class="scene s-album" data-dur="11" data-shade=".78">
+  <div class="head">
+    <div class="over a" style="justify-content:center">Album</div>
+    <h2 class="a" style="--d:.2">Khoảnh khắc <em>đáng nhớ</em></h2>
+  </div>
+  <div class="album" id="album"></div>
+</section>
+
+<section class="scene s-letter" data-dur="17" data-shade=".8">
+  <div class="wrap">
+    <div>
+      <div class="over a">Lá thư</div>
+      <h2 class="a" style="--d:.3">Những điều <em>muốn nói</em></h2>
+      <p class="lead a" style="--d:.7">Có những lời cả lớp giữ trong lòng suốt hành trình. Đêm nay, chúng em gửi đến chị.</p>
+    </div>
+    <div class="letter a" style="--d:.5">
+      <div class="line">Chị Trà kính mến,</div>
+      <div class="line">Ngày khai giảng ở PV College, sáu mươi người chúng em còn nhiều bỡ ngỡ.</div>
+      <div class="line">Từ Kho cảng Thị Vải đến Sông Hậu, rồi Cà Mau,</div>
+      <div class="line">chị luôn đồng hành cùng lớp trên từng chặng đường.</div>
+      <div class="line">Chị giúp chúng em nhìn công việc mình trong một bức tranh lớn hơn,</div>
+      <div class="line">và học vì chính mình muốn trưởng thành.</div>
+      <div class="line">Cả lớp luôn quý mến và kính trọng chị,</div>
+      <div class="line">mong chị luôn khỏe, luôn vui, mãi là người chị của PV-NEXT.</div>
+      <div class="sign">Lớp PV-NEXT 2025</div>
+    </div>
+  </div>
+</section>
+
+<section class="scene s-video" data-wait="video" data-shade="1">
+  <video id="mem" playsinline preload="auto"></video>
+</section>
+
+<section class="scene s-notes" data-dur="12" data-shade=".8">
+  <div class="head">
+    <div class="over a" style="justify-content:center">Lời nhắn</div>
+    <h2 class="a" style="--d:.2">Cả lớp <em>gửi chị</em></h2>
+  </div>
+  <div class="notes" id="notes"></div>
+</section>
+
+<section class="scene s-end" data-dur="14" data-shade=".55">
+  <div class="center">
+    <h2 class="a">Kính mến<br><em class="shimmer" style="white-space:nowrap">Chị Trà</em></h2>
+    <div class="hand a" style="--d:1.2">Cả lớp PV-NEXT 2025 luôn quý mến và kính trọng chị</div>
+    <div class="sig a" style="--d:2">Lớp PV-NEXT 2025 · Đêm Gala</div>
+  </div>
+</section>
+
+<canvas id="fx"></canvas>
+<div class="grain"></div>
+<div class="lbx t"></div><div class="lbx b"></div>
+<div id="prog"></div>
+<div id="pauseTag">TẠM DỪNG</div>
+<div id="hud"><span><kbd>→</kbd>Cảnh tiếp</span><span><kbd>←</kbd>Cảnh trước</span><span><kbd>Space</kbd>Dừng / chạy</span><span><kbd>F</kbd>Toàn màn hình</span><span><kbd>M</kbd>Nhạc</span></div>
+<div id="fin"></div>
+
+<div id="intro">
+  <canvas id="burst"></canvas>
+  <div class="i-line"></div>
+  <div class="i-date">Đêm Gala · PV-NEXT 2025</div>
+  <h1 class="i-title"><span class="i-a">Gửi</span><span class="i-b shimmer">Chị Trà</span></h1>
+  <div class="i-sub">với tất cả sự quý mến và kính trọng</div>
+</div>
+
+<div id="loader">
+  <div class="mark">Gửi Chị</div>
+  <div class="pct" id="lpct">Đang tải…</div>
+  <button id="startBtn" aria-label="Bắt đầu"><svg viewBox="0 0 24 24"><path d="M6 4l15 8-15 8z"/></svg></button>
+  <small>Bấm hoặc nhấn phím bất kỳ để bắt đầu</small>
+</div>
+
+<script>
+/* =====================================================================
+   CONFIG: thay ảnh / video / chữ tại đây
+   ===================================================================== */
+const CONFIG = {
+  name: 'Chị Lê Thị Lam Trà',
+
+  // Video nền xuyên suốt: hoa nở (CC0, đã tải về máy). Thay: 'video/nen.mp4'
+  bgVideo: 'video/hoa-no.mp4',
+  bgRate: 0.5,          // tốc độ phát video nền: 0.5 = chậm một nửa
+  bgLoop: false,        // false: phát một lần rồi giữ khung cuối (hoa nở hẳn); true: lặp lại
+
+  // Video kỷ niệm phát toàn màn hình giữa phim. Để '' để bỏ cảnh này.
+  memoryVideo: 'video/hoa-no.mp4',   // GIỮ CHỖ: thay bằng 'video/ky-niem.mp4' của lớp
+
+  music: '',            // nhạc nền, ví dụ 'nhac/nen.mp3'
+  fullscreenOnStart: true,
+
+  // Ảnh DEMO lấy từ các bài PetroTimes về lớp. Thay bằng ảnh gốc: 'anh/01.jpg' ...
+  timeline: [
+    { year: '11/2025', title: 'Ngày khai giảng', text: 'Khóa đầu tiên của chương trình “Lãnh đạo tương lai Petrovietnam” khai giảng tại PV College, quy tụ 60 học viên từ khắp Tập đoàn.', img: 'https://cdn.petrotimes.vn/stores/news_dataimages/2025/112025/08/16/z7202550793961-051a150facceb94e05f71f2cd357d70d20251108165227.jpg', cap: 'Khai giảng · PV College' },
+    { year: '11/2025', title: 'Kho cảng LNG Thị Vải', text: 'Lớp trải nghiệm thực tế tại Kho cảng LNG Thị Vải: từ tiếp nhận tàu, tồn chứa đến tái hóa khí cấp cho nhà máy điện.', img: 'https://cdn.petrotimes.vn/stores/news_dataimages/2025/112025/27/14/z7267081725359-76590c81dab91320c414e505fe035c0920251127144756.jpg', cap: 'LNG Thị Vải' },
+    { year: '3/2026', title: 'Hành trình Tây Nam Bộ', text: 'Nhiệt điện Sông Hậu 1, rồi Cụm Khí – Điện – Đạm Cà Mau. Lần đầu cả lớp thấy công việc của mình “chảy” trong cả chuỗi giá trị.', img: 'https://cdn.petrotimes.vn/stores/news_dataimages/2026/032026/31/16/z7646063643909-8157d5ec345b090643a25da25fbed66d20260331160817.jpg', cap: 'Sông Hậu · Cà Mau' },
+    { year: 'Đêm nay', title: 'Đêm Gala', text: 'Đêm nay, cả lớp muốn nói với chị một điều: chúng em luôn quý mến và kính trọng chị.', img: 'https://cdn.petrotimes.vn/stores/news_dataimages/2025/112025/08/16/z7202550775262-39faea53f45ad17e0113848a093c4c4920251108165229.jpg', cap: 'PV-NEXT 2025' },
+  ],
+  timelineDur: 7,       // số giây mỗi mốc
+
+  album: [
+    { img: 'https://cdn.petrotimes.vn/stores/news_dataimages/2025/112025/27/17/z7268445289149-1616c10ead2b53cb8d27c81e5c2089e220251127170223.jpg', cap: 'Kho cảng LNG Thị Vải' },
+    { img: 'https://cdn.petrotimes.vn/stores/news_dataimages/2026/032026/31/16/z7646063804007-026ee151599d64ca3c771e61002b039420260331160823.jpg', cap: 'Nhiệt điện Sông Hậu 1' },
+    { img: 'https://cdn.petrotimes.vn/stores/news_dataimages/2025/112025/08/16/z7202550870769-fc5fa7600d090d794229fd55e1af51df20251108165222.jpg', cap: 'Ngày đầu nhập học' },
+    { img: 'https://cdn.petrotimes.vn/stores/news_dataimages/2026/032026/31/16/z7646064166397-79f83a38e426f8a39a80a4faa8308c3020260331160827.jpg', cap: 'Cụm Khí – Điện – Đạm Cà Mau' },
+    { img: 'https://cdn.petrotimes.vn/stores/news_dataimages/2025/112025/27/14/z7267379094208-ce5e194cccf297c3e317d172a20d8c4820251127144759.jpg', cap: 'Trải nghiệm thực tế' },
+    { img: 'https://cdn.petrotimes.vn/stores/news_dataimages/2026/032026/31/16/z7646064485714-5db5a1996fcd849090a0a6d94bbfaa4020260331160829.jpg', cap: 'Đạm Cà Mau' },
+    { img: 'https://cdn.petrotimes.vn/stores/news_dataimages/2025/112025/08/16/z7202550808810-1eccce30a43b7418befebee6dee3d0ab20251108165225.jpg', cap: 'PV College' },
+    { img: 'https://cdn.petrotimes.vn/stores/news_dataimages/2025/112025/27/16/z7268428184037-e9c65ca3c204af6051657f25d64dc43620251127165739.jpg', cap: 'Cả đoàn cùng nhau' },
+  ],
+
+  // Lời nhắn giữ chỗ: thay bằng lời và tên thật của học viên (6 tấm)
+  notes: [
+    { text: 'Cảm ơn chị đã tin vào chúng em từ ngày đầu tiên của khóa học.', who: 'Tên học viên' },
+    { text: 'Chuyến đi Tây Nam Bộ là lần đầu em thấy rõ công việc của mình chảy về đâu. Cảm ơn chị.', who: 'Tên học viên' },
+    { text: 'Chị nghiêm khi cần, nhưng lúc nào cũng ấm áp. Em quý chị lắm.', who: 'Tên học viên' },
+    { text: 'Những lời nhắc nhẹ nhàng của chị, em sẽ mang theo trên từng vị trí công việc.', who: 'Tên học viên' },
+    { text: 'Ở PV-NEXT, chị không chỉ là người phụ trách lớp, chị là người chị của cả nhà.', who: 'Tên học viên' },
+    { text: 'Cảm ơn chị đã luôn ở bên lớp. Cả lớp quý mến và kính trọng chị.', who: '60 học viên PV-NEXT 2025' },
+  ],
+};
+
+/* ===================================================================== */
+const $ = s => document.querySelector(s), $$ = s => [...document.querySelectorAll(s)];
+const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
+const lerp = (a, b, t) => a + (b - a) * t;
+const ease = t => 1 - Math.pow(1 - t, 3);
+const QUAY = new URLSearchParams(location.search).has('quay');
+if (QUAY) document.body.classList.add('rec');
+
+/* ---------- dựng cảnh từ CONFIG ---------- */
+$$('[data-name]').forEach(el => el.textContent = CONFIG.name);
+$$('[data-split]').forEach(el => {
+  el.innerHTML = el.textContent.trim().split(/\s+/).map(w => '<span style="white-space:nowrap">' +
+    [...w].map(c => `<span class="ch">${c}</span>`).join('') + '</span>').join(' ');
+  el.querySelectorAll('.ch').forEach((c, i) => c.style.transitionDelay = (.3 + i * .045) + 's');
+});
+
+const slot = $('#tlSlot');
+CONFIG.timeline.forEach(t => {
+  const s = document.createElement('section');
+  s.className = 'scene s-tl'; s.dataset.dur = CONFIG.timelineDur; s.dataset.shade = '.2';
+  s.innerHTML = `<div class="ph" style="background-image:url('${t.img}')"></div><div class="fade"></div>
+    <div class="left" style="width:min(640px,80vw)">
+      <div class="over a">PV-NEXT 2025</div>
+      <div class="yr a" style="--d:.3">${t.year}</div>
+      <h2 class="a" style="--d:.6">${t.title}</h2>
+      <p class="lead a" style="--d:1">${t.text}</p>
+    </div>
+    <div class="cap a" style="--d:1.6">${t.cap}</div>`;
+  slot.before(s);
+});
+slot.remove();
+
+const rots = [-3, 2, -1.5, 3, 2.5, -2, 1.5, -2.5];
+$('#album').innerHTML = CONFIG.album.slice(0, 8).map((a, i) =>
+  `<figure class="polaroid a" style="--rot:${rots[i]}deg;--d:${.6 + i * .28}"><div class="im" style="background-image:url('${a.img}')"></div><figcaption>${a.cap}</figcaption></figure>`).join('');
+$('#notes').innerHTML = CONFIG.notes.slice(0, 6).map((n, i) =>
+  `<div class="note a" style="--rot:${rots[i] * .7}deg;--d:${.6 + i * .35}"><p>${n.text}</p><div class="who">${n.who}</div></div>`).join('');
+$$('.letter .line').forEach((l, i) => l.style.setProperty('--d', 1.2 + i * 1.25));
+
+/* ---------- video ---------- */
+const bg = $('#bg'), mem = $('#mem');
+bg.loop = CONFIG.bgLoop;
+if (CONFIG.bgVideo) bg.src = CONFIG.bgVideo;
+if (CONFIG.memoryVideo) mem.src = CONFIG.memoryVideo; else $('.s-video').remove();
+
+const music = CONFIG.music ? new Audio(CONFIG.music) : null;
+if (music) { music.loop = true; music.volume = 0; }
+function fadeMusic(to, ms = 1500) {
+  if (!music) return;
+  const from = music.volume, st = performance.now();
+  (function f(n) { const k = clamp((n - st) / ms, 0, 1); music.volume = lerp(from, to, k); if (k < 1) requestAnimationFrame(f); })(st);
+}
+
+/* ---------- trình chiếu cảnh ---------- */
+const scenes = $$('.scene');
+let cur = -1, timer = null, paused = false, started = false;
+
+function show(i) {
+  i = clamp(i, 0, scenes.length - 1);
+  if (i === cur) return;
+  const prev = scenes[cur];
+  if (prev) { prev.classList.remove('on'); leave(prev); }
+  cur = i;
+  const s = scenes[i];
+  s.classList.add('on');
+  $('#shade').style.opacity = s.dataset.shade ?? .4;
+  $('#prog').style.width = (i + 1) / scenes.length * 100 + '%';
+  enter(s);
+  schedule();
+}
+function schedule() {
+  clearTimeout(timer);
+  if (paused) return;
+  const s = scenes[cur];
+  if (s.dataset.wait === 'video') return;                 // chờ video kỷ niệm kết thúc
+  const ms = (+s.dataset.dur || 7) * 1000;
+  if (cur === scenes.length - 1) { timer = setTimeout(() => { $('#fin').classList.add('on'); fadeMusic(0, 3000); }, ms); return; }
+  timer = setTimeout(() => show(cur + 1), ms);
+}
+function enter(s) {
+  if (s.querySelector('[data-count]')) runCounters(s);
+  if (s.classList.contains('s-video')) { mem.currentTime = 0; mem.play().catch(() => show(cur + 1)); fadeMusic(.1); }
+  if (s.classList.contains('s-end')) { confettiOn = true; burstConfetti(); }
+}
+function leave(s) {
+  if (s.classList.contains('s-video')) { mem.pause(); fadeMusic(.6); }
+  if (s.classList.contains('s-end')) confettiOn = false;
+}
+mem.addEventListener('ended', () => { if (scenes[cur]?.classList.contains('s-video')) show(cur + 1); });
+mem.addEventListener('error', () => { if (scenes[cur]?.classList.contains('s-video')) show(cur + 1); });
+
+function runCounters(s) {
+  s.querySelectorAll('[data-count]').forEach(el => {
+    const target = +el.dataset.count, suf = el.dataset.suffix || '', st = performance.now() + 900;
+    el.textContent = '0' + suf;
+    (function up(n) {
+      const k = ease(clamp((n - st) / 1700, 0, 1));
+      el.textContent = Math.round(target * k) + suf;
+      if (k < 1) requestAnimationFrame(up);
+    })(st);
+  });
+}
+function togglePause() {
+  paused = !paused; document.body.classList.toggle('paused', paused);
+  if (scenes[cur]?.classList.contains('s-video')) paused ? mem.pause() : mem.play();
+  schedule();
+}
+function restart() {
+  $('#fin').classList.remove('on'); paused = false; document.body.classList.remove('paused');
+  bg.currentTime = 0; bg.play().catch(() => {}); show(0);
+}
+function toggleFs() {
+  if (document.fullscreenElement) document.exitFullscreen();
+  else document.documentElement.requestFullscreen?.().catch(() => {});
+}
+
+/* ---------- hạt vàng + kim tuyến ---------- */
+const fx = $('#fx'), fc = fx.getContext('2d');
+let W, H, DPR;
+function resize() {
+  DPR = Math.min(devicePixelRatio || 1, 2); W = innerWidth; H = innerHeight;
+  for (const c of [fx, $('#burst')]) { c.width = W * DPR; c.height = H * DPR; c.getContext('2d').setTransform(DPR, 0, 0, DPR, 0, 0); }
+}
+resize(); addEventListener('resize', resize);
+const dust = Array.from({ length: 60 }, () => ({ x: Math.random(), y: Math.random(), r: .4 + Math.random() * 1.7, vy: .00015 + Math.random() * .0004, ph: Math.random() * 6.28, a: .15 + Math.random() * .45 }));
+let confetti = [], confettiOn = false;
+const GOLD = ['#f1d4a8', '#e9c99a', '#c89848', '#fff1d0', '#d9a95f'];
+function addConfetti(burst) {
+  confetti.push({
+    x: burst ? W / 2 + (Math.random() - .5) * 200 : Math.random() * W, y: burst ? H * .55 : -20,
+    vx: burst ? (Math.random() - .5) * 14 : (Math.random() - .5) * .6, vy: burst ? -4 - Math.random() * 9 : .7 + Math.random() * 1.2,
+    r: 6 + Math.random() * 8, rot: Math.random() * 6.28, vr: (Math.random() - .5) * .08, c: GOLD[Math.random() * 5 | 0], ph: Math.random() * 6.28
+  });
+}
+function burstConfetti() { for (let i = 0; i < 120; i++) addConfetti(true); }
+(function loop(now) {
+  fc.clearRect(0, 0, W, H);
+  const t = now / 1000;
+  dust.forEach(p => {
+    p.y -= p.vy; if (p.y < -.02) { p.y = 1.02; p.x = Math.random(); }
+    fc.fillStyle = `rgba(255,236,200,${p.a * (.6 + .4 * Math.sin(t * 1.4 + p.ph))})`;
+    fc.beginPath(); fc.arc((p.x + Math.sin(t * .3 + p.ph) * .01) * W, p.y * H, p.r, 0, 6.283); fc.fill();
+  });
+  if (confettiOn && confetti.length < 90 && Math.random() < .3) addConfetti(false);
+  confetti.forEach(p => {
+    p.vy += p.vy < 1.5 ? .06 : 0; p.vx *= .985;
+    p.x += p.vx + Math.sin(now / 900 + p.ph) * .5; p.y += p.vy; p.rot += p.vr;
+    fc.save(); fc.translate(p.x, p.y); fc.rotate(p.rot);
+    fc.globalAlpha = .55 + .4 * Math.abs(Math.cos(p.rot * 3));
+    fc.fillStyle = p.c; fc.fillRect(-p.r * .5, -p.r * .16, p.r, p.r * .32);
+    fc.restore();
+  });
+  confetti = confetti.filter(p => p.y < H + 30);
+  requestAnimationFrame(loop);
+})(0);
+
+/* ---------- intro ---------- */
+let introOn = false, introT = [];
+const bc = $('#burst'), bx = bc.getContext('2d');
+let sparks = [], burstOn = true;
+for (let i = 0; i < 90; i++) sparks.push({ x: Math.random() * innerWidth, y: Math.random() * innerHeight, vx: 0, vy: -(.1 + Math.random() * .4), r: .5 + Math.random() * 1.6, life: Infinity, a: .15 + Math.random() * .45 });
+function burst() {
+  const cx = W / 2, cy = H * .6;
+  for (let i = 0; i < 260; i++) {
+    const an = Math.random() * 6.283, sp = 2 + Math.random() * 10;
+    sparks.push({ x: cx, y: cy, vx: Math.cos(an) * sp, vy: Math.sin(an) * sp * .7, r: .6 + Math.random() * 2.4, life: 70 + Math.random() * 90, a: 1, g: true });
+  }
+}
+(function bLoop() {
+  if (!burstOn) return;
+  bx.clearRect(0, 0, W, H); bx.globalCompositeOperation = 'lighter';
+  sparks.forEach(p => {
+    p.x += p.vx; p.y += p.vy;
+    if (p.g) { p.vx *= .96; p.vy = p.vy * .96 + .05; p.life--; p.a = Math.max(0, p.life / 130); }
+    else if (p.y < -5) p.y = H + 5;
+    bx.fillStyle = `rgba(241,212,168,${p.a})`; bx.beginPath(); bx.arc(p.x, p.y, p.r, 0, 6.283); bx.fill();
+  });
+  sparks = sparks.filter(p => p.life > 0);
+  requestAnimationFrame(bLoop);
+})();
+function start() {
+  if (started || !$('#loader').classList.contains('ready')) return;
+  started = true;
+  if (CONFIG.fullscreenOnStart) toggleFs();
+  if (music) music.play().then(() => fadeMusic(.6, 3000)).catch(() => {});
+  $('#loader').classList.add('done');
+  introOn = true; $('#intro').classList.add('play');
+  introT.push(setTimeout(burst, 2600), setTimeout(endIntro, 6800));
+}
+function endIntro() {
+  if (!introOn) return;
+  introOn = false; introT.forEach(clearTimeout);
+  $('#intro').classList.add('out');
+  bg.currentTime = 0; bg.playbackRate = CONFIG.bgRate || 1; bg.play().catch(() => {});   // hoa nở khi màn intro kéo lên
+  setTimeout(() => { $('#intro').style.display = 'none'; burstOn = false; }, 1800);
+  setTimeout(() => show(0), 900);
+}
+$('#startBtn').onclick = start;
+
+/* ---------- phím ---------- */
+addEventListener('keydown', e => {
+  if (!started) { e.preventDefault(); start(); return; }
+  if (QUAY) { e.preventDefault(); return; }
+  if (introOn) { e.preventDefault(); endIntro(); return; }
+  const k = e.key;
+  if (['ArrowRight', 'ArrowDown', 'PageDown', 'Enter'].includes(k)) { e.preventDefault(); show(cur + 1); }
+  else if (['ArrowLeft', 'ArrowUp', 'PageUp'].includes(k)) { e.preventDefault(); show(cur - 1); }
+  else if (k === ' ') { e.preventDefault(); togglePause(); }
+  else if (k === 'Home') { e.preventDefault(); restart(); }
+  else if (k === 'f' || k === 'F') toggleFs();
+  else if (k === 'm' || k === 'M') { if (music) music.paused ? music.play() : music.pause(); }
+});
+let idleT;
+function wake() { document.body.classList.remove('idle'); clearTimeout(idleT); idleT = setTimeout(() => document.body.classList.add('idle'), 2500); }
+addEventListener('mousemove', wake); wake();
+
+/* ---------- tải trước ảnh rồi hiện nút bắt đầu ---------- */
+(function preload() {
+  const urls = [...CONFIG.timeline.map(t => t.img), ...CONFIG.album.map(a => a.img)];
+  let done = 0; const total = urls.length + 1;
+  const bump = () => { done++; $('#lpct').textContent = 'Đang tải… ' + Math.round(done / total * 100) + '%'; };
+  const waits = urls.map(u => new Promise(r => { const im = new Image(); im.onload = im.onerror = () => { bump(); r(); }; im.src = u; }));
+  waits.push(new Promise(r => { if (!CONFIG.bgVideo || bg.readyState >= 2) { bump(); r(); } else { bg.addEventListener('loadeddata', () => { bump(); r(); }, { once: true }); bg.addEventListener('error', () => { bump(); r(); }, { once: true }); } }));
+  Promise.race([Promise.all(waits), new Promise(r => setTimeout(r, 8000))]).then(() => $('#loader').classList.add('ready'));
+})();
+</script>
+</body>
+</html>
