@@ -103,6 +103,7 @@ p.lead{margin-top:22px;font-size:clamp(15px,1.25vw,22px);line-height:1.65;color:
 .split .side{position:absolute;top:0;bottom:0;width:52%;overflow:hidden}
 .split .side.l{left:0}.split .side.r{right:0}
 .split .side .ph{inset:-6%}
+.ph[data-photo="lessons"]{background-position:center 72%}
 .split .side.l{-webkit-mask-image:linear-gradient(270deg,transparent,#000 45%);mask-image:linear-gradient(270deg,transparent,#000 45%)}
 .split .side.r{-webkit-mask-image:linear-gradient(90deg,transparent,#000 45%);mask-image:linear-gradient(90deg,transparent,#000 45%)}
 .split .txt{position:absolute;top:50%;transform:translateY(-50%);width:42%}
@@ -366,19 +367,17 @@ const CONFIG = {
   // Chuỗi video phát toàn màn hình giữa phim (start/end: giây cắt đoạn, bỏ trống = cả video).
   // Để [] để bỏ cảnh này.
   memoryVideo: [
-    { src: 'video/chi-phat-bieu-1.webm' },   // đã cắt và nén từ C1602.MP4
-    { src: 'video/chi-phat-bieu-2.webm' },   // từ C1610.MP4
-    { src: 'video/chi-giao-luu.webm' },      // từ C1676.MP4 (8,5 giây đầu)
+    { src: 'video/chi-phat-bieu.mp4', end: 12 },   // từ C1602.MP4 (H.264, 25 khung/giây), dừng ở câu "đơn vị chúng ta"
   ],
 
   // Ảnh của chị ở các cảnh: chân dung, câu trích dẫn, bài học
   photos: {
     portrait: 'anh/chi-song-hau.jpg',
     quote: 'anh/chi-noi-chuyen.jpg',
-    lessons: 'anh/chi-cuoi.jpg',
+    lessons: 'anh/chi-vuon-xoai.jpg',
   },
 
-  music: '',            // nhạc nền, ví dụ 'nhac/nen.mp3'
+  music: 'nhac/all-out-of-love.mp3',   // nhạc nền (không đưa lên GitHub, xem .gitignore)
   fullscreenOnStart: true,
 
   // Ảnh của lớp (đã thu nhỏ từ thư mục Mdm Tea)
@@ -395,8 +394,8 @@ const CONFIG = {
     { img: 'anh/chi-lang-nghe.jpg', cap: 'Chăm chú cùng lớp' },
     { img: 'anh/xe-dien.jpg', cap: 'Lên đường thôi!' },
     { img: 'anh/chi-va-ban.jpg', cap: 'Bên dòng sông Hậu' },
-    { img: 'anh/cong-truong.jpg', cap: 'Đi thực tế' },
-    { img: 'anh/phong-dieu-khien.jpg', cap: 'Phòng điều khiển' },
+    { img: 'anh/dam-cuoi-thao.jpg', cap: 'Đám cưới Thảo' },
+    { img: 'anh/chi-khai-giang.jpg', cap: 'Ngày khai giảng', pos: 'center 32%' },
     { img: 'anh/san-khau-hoa.jpg', cap: 'Những bó hoa' },
     { img: 'anh/hoi-truong.jpg', cap: 'Cả lớp cùng nhau' },
     { img: 'anh/bua-com.jpg', cap: 'Bữa cơm thân mật' },
@@ -447,7 +446,7 @@ slot.remove();
 
 const rots = [-3, 2, -1.5, 3, 2.5, -2, 1.5, -2.5];
 $('#album').innerHTML = CONFIG.album.slice(0, 8).map((a, i) =>
-  `<figure class="polaroid a" style="--rot:${rots[i]}deg;--d:${.6 + i * .28}"><div class="im" style="background-image:url('${a.img}')"></div><figcaption>${a.cap}</figcaption></figure>`).join('');
+  `<figure class="polaroid a" style="--rot:${rots[i]}deg;--d:${.6 + i * .28}"><div class="im" style="background-image:url('${a.img}');background-position:${a.pos || 'center'}"></div><figcaption>${a.cap}</figcaption></figure>`).join('');
 $('#notes').innerHTML = CONFIG.notes.slice(0, 6).map((n, i) =>
   `<div class="note a" style="--rot:${rots[i] * .7}deg;--d:${.6 + i * .35}"><p>${n.text}</p>${n.who ? `<div class="who">${n.who}</div>` : ''}</div>`).join('');
 $$('.letter .line').forEach((l, i) => l.style.setProperty('--d', 1.2 + i * 1.25));
@@ -516,7 +515,7 @@ function schedule() {
 }
 function enter(s) {
   if (s.querySelector('[data-count]')) runCounters(s);
-  if (s.classList.contains('s-video')) { playClip(0); fadeMusic(.1); }
+  if (s.classList.contains('s-video')) { playClip(0); fadeMusic(.04); }   // nhạc gần như tắt để nghe rõ giọng chị
   if (s.classList.contains('s-end')) { confettiOn = true; burstConfetti(); }
 }
 function leave(s) {
