@@ -1,6 +1,6 @@
-# Gửi Chị Trà · Đêm Gala PV-NEXT 2025
+# Gửi Chị Trà · Đêm Gala PETROVIETNAM-NEXT 2025
 
-Phim tự chạy (khoảng 2,5 phút) do lớp **Lãnh đạo tương lai Petrovietnam 2025 (PV-NEXT 2025)** làm tặng chị Lê Thị Lam Trà.
+Phim tự chạy (khoảng 2,5 phút) do lớp **Lãnh đạo tương lai Petrovietnam 2025 (PETROVIETNAM-NEXT 2025)** làm tặng chị Lê Thị Lam Trà.
 
 ## Mở phim
 
