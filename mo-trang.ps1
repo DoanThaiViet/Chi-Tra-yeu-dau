@@ -6,7 +6,7 @@ $l = New-Object System.Net.HttpListener
 $l.Prefixes.Add("http://localhost:$port/")
 $l.Start()
 Write-Host "Dang chay tai http://localhost:$port/tri-an-chi-tra/phim.html  (dong cua so nay de tat)"
-$types = @{ '.html'='text/html; charset=utf-8'; '.js'='text/javascript'; '.css'='text/css'; '.jpg'='image/jpeg'; '.jpeg'='image/jpeg'; '.png'='image/png'; '.webp'='image/webp'; '.mp4'='video/mp4'; '.webm'='video/webm'; '.mp3'='audio/mpeg'; '.m4a'='audio/mp4' }
+$types = @{ '.html'='text/html; charset=utf-8'; '.js'='text/javascript'; '.css'='text/css'; '.jpg'='image/jpeg'; '.jpeg'='image/jpeg'; '.png'='image/png'; '.webp'='image/webp'; '.mp4'='video/mp4'; '.webm'='video/webm'; '.ico'='image/x-icon'; '.mp3'='audio/mpeg'; '.m4a'='audio/mp4' }
 while ($l.IsListening) {
   $c = $l.GetContext()
   try {

@@ -95,6 +95,23 @@ p.lead{margin-top:22px;font-size:clamp(15px,1.25vw,22px);line-height:1.65;color:
 .s-tl h2{font-size:clamp(36px,3.6vw,64px);margin-top:10px}
 .s-tl .cap{position:absolute;right:6vw;bottom:9vh;font-family:var(--hand);font-size:clamp(22px,2vw,34px);color:rgba(251,247,240,.8)}
 
+/* ảnh chị: chân dung toàn màn hình và bố cục nửa ảnh – nửa chữ */
+.s-portrait .fade{position:absolute;inset:0;background:radial-gradient(ellipse at center,transparent 45%,rgba(11,8,5,.55)),linear-gradient(0deg,rgba(11,8,5,.7),transparent 35%)}
+.s-portrait .cap{position:absolute;right:7vw;bottom:12vh;text-align:right}
+.s-portrait .cap .hand{font-family:var(--hand);font-size:clamp(34px,3.6vw,66px);color:#f1d4a8;line-height:1.1}
+.s-portrait .cap .sm{margin-top:10px;font-size:clamp(10px,.8vw,13px);letter-spacing:.4em;text-transform:uppercase;color:rgba(251,247,240,.7)}
+.split .side{position:absolute;top:0;bottom:0;width:52%;overflow:hidden}
+.split .side.l{left:0}.split .side.r{right:0}
+.split .side .ph{inset:-6%}
+.split .side.l{-webkit-mask-image:linear-gradient(270deg,transparent,#000 45%);mask-image:linear-gradient(270deg,transparent,#000 45%)}
+.split .side.r{-webkit-mask-image:linear-gradient(90deg,transparent,#000 45%);mask-image:linear-gradient(90deg,transparent,#000 45%)}
+.split .txt{position:absolute;top:50%;transform:translateY(-50%);width:42%}
+.split .txt.r{right:6vw;text-align:left}.split .txt.l{left:7vw}
+.s-quote.split blockquote{font-size:clamp(28px,2.7vw,50px)}
+.s-video .lower{position:absolute;left:6vw;bottom:11vh;z-index:2;font-family:var(--hand);font-size:clamp(26px,2.4vw,44px);color:#f1d4a8;text-shadow:0 2px 20px rgba(0,0,0,.7)}
+.s-video video{transition:opacity .5s}
+.s-video video.out{opacity:0}
+
 /* album */
 .s-album .head{position:absolute;left:0;right:0;top:9vh;text-align:center}
 .s-album h2{font-size:clamp(40px,4.4vw,80px)}
@@ -198,8 +215,17 @@ body.rec,body.rec *{cursor:none!important}
   </div>
 </section>
 
-<section class="scene s-quote" data-dur="8" data-shade=".62">
-  <div class="center">
+<section class="scene s-portrait" data-dur="7" data-shade="1">
+  <div class="ph" data-photo="portrait"></div><div class="fade"></div>
+  <div class="cap">
+    <div class="hand a" style="--d:.8">Người chị của cả lớp</div>
+    <div class="sm a" style="--d:1.4">PV-NEXT 2025</div>
+  </div>
+</section>
+
+<section class="scene s-quote split" data-dur="9" data-shade="1">
+  <div class="side l"><div class="ph" data-photo="quote"></div></div>
+  <div class="txt r">
     <div class="mark a">“</div>
     <blockquote class="a" style="--d:.4">Khi hiểu mình đang góp phần vào đâu, việc học không còn là yêu cầu, mà trở thành nhu cầu tự thân.</blockquote>
     <div class="by a" style="--d:1.4">Chị chia sẻ sau hành trình Tây Nam Bộ · 3/2026</div>
@@ -219,8 +245,9 @@ body.rec,body.rec *{cursor:none!important}
   </div>
 </section>
 
-<section class="scene s-lessons" data-dur="9" data-shade=".66">
-  <div class="left">
+<section class="scene s-lessons split" data-dur="9" data-shade="1">
+  <div class="side r"><div class="ph" data-photo="lessons"></div></div>
+  <div class="txt l" style="width:46%">
     <div class="over a">Điều chúng em học từ chị</div>
     <h2 class="a" style="--d:.3">Những bài học <em>ngoài giáo trình</em></h2>
     <ul class="gifts">
@@ -265,6 +292,7 @@ body.rec,body.rec *{cursor:none!important}
 
 <section class="scene s-video" data-wait="video" data-shade="1">
   <video id="mem" playsinline preload="auto"></video>
+  <div class="lower a" style="--d:1">Những khoảnh khắc của chị cùng lớp</div>
 </section>
 
 <section class="scene s-notes" data-dur="12" data-shade=".8">
@@ -277,7 +305,7 @@ body.rec,body.rec *{cursor:none!important}
 
 <section class="scene s-end" data-dur="14" data-shade=".55">
   <div class="center">
-    <h2 class="a">Kính mến<br><em class="shimmer" style="white-space:nowrap">Chị Trà</em></h2>
+    <h2 class="a">Mãi yêu<br><em class="shimmer" style="white-space:nowrap">Chị Trà</em></h2>
     <div class="hand a" style="--d:1.2">Cả lớp PV-NEXT 2025 luôn quý mến và kính trọng chị</div>
     <div class="sig a" style="--d:2">Lớp PV-NEXT 2025 · Đêm Gala</div>
   </div>
@@ -318,39 +346,52 @@ const CONFIG = {
   bgRate: 0.5,          // tốc độ phát video nền: 0.5 = chậm một nửa
   bgLoop: false,        // false: phát một lần rồi giữ khung cuối (hoa nở hẳn); true: lặp lại
 
-  // Video kỷ niệm phát toàn màn hình giữa phim. Để '' để bỏ cảnh này.
-  memoryVideo: 'video/hoa-no.mp4',   // GIỮ CHỖ: thay bằng 'video/ky-niem.mp4' của lớp
+  // Chuỗi video phát toàn màn hình giữa phim (start/end: giây cắt đoạn, bỏ trống = cả video).
+  // Để [] để bỏ cảnh này.
+  memoryVideo: [
+    { src: 'video/chi-phat-bieu-1.webm' },   // đã cắt và nén từ C1602.MP4
+    { src: 'video/chi-phat-bieu-2.webm' },   // từ C1610.MP4
+    { src: 'video/chi-giao-luu.webm' },      // từ C1676.MP4 (8,5 giây đầu)
+  ],
+
+  // Ảnh của chị ở các cảnh: chân dung, câu trích dẫn, bài học
+  photos: {
+    portrait: 'anh/chi-song-hau.jpg',
+    quote: 'anh/chi-noi-chuyen.jpg',
+    lessons: 'anh/chi-cuoi.jpg',
+  },
 
   music: '',            // nhạc nền, ví dụ 'nhac/nen.mp3'
   fullscreenOnStart: true,
 
-  // Ảnh DEMO lấy từ các bài PetroTimes về lớp. Thay bằng ảnh gốc: 'anh/01.jpg' ...
+  // Ảnh của lớp (đã thu nhỏ từ thư mục Mdm Tea)
   timeline: [
-    { year: '11/2025', title: 'Ngày khai giảng', text: 'Khóa đầu tiên của chương trình “Lãnh đạo tương lai Petrovietnam” khai giảng tại PV College, quy tụ 60 học viên từ khắp Tập đoàn.', img: 'https://cdn.petrotimes.vn/stores/news_dataimages/2025/112025/08/16/z7202550793961-051a150facceb94e05f71f2cd357d70d20251108165227.jpg', cap: 'Khai giảng · PV College' },
-    { year: '11/2025', title: 'Kho cảng LNG Thị Vải', text: 'Lớp trải nghiệm thực tế tại Kho cảng LNG Thị Vải: từ tiếp nhận tàu, tồn chứa đến tái hóa khí cấp cho nhà máy điện.', img: 'https://cdn.petrotimes.vn/stores/news_dataimages/2025/112025/27/14/z7267081725359-76590c81dab91320c414e505fe035c0920251127144756.jpg', cap: 'LNG Thị Vải' },
-    { year: '3/2026', title: 'Hành trình Tây Nam Bộ', text: 'Nhiệt điện Sông Hậu 1, rồi Cụm Khí – Điện – Đạm Cà Mau. Lần đầu cả lớp thấy công việc của mình “chảy” trong cả chuỗi giá trị.', img: 'https://cdn.petrotimes.vn/stores/news_dataimages/2026/032026/31/16/z7646063643909-8157d5ec345b090643a25da25fbed66d20260331160817.jpg', cap: 'Sông Hậu · Cà Mau' },
-    { year: 'Đêm nay', title: 'Đêm Gala', text: 'Đêm nay, cả lớp muốn nói với chị một điều: chúng em luôn quý mến và kính trọng chị.', img: 'https://cdn.petrotimes.vn/stores/news_dataimages/2025/112025/08/16/z7202550775262-39faea53f45ad17e0113848a093c4c4920251108165229.jpg', cap: 'PV-NEXT 2025' },
+    { year: '11/2025', title: 'Ngày khai giảng', text: 'Khóa đầu tiên của chương trình “Lãnh đạo tương lai Petrovietnam” khai giảng tại PV College, quy tụ 60 học viên từ khắp Tập đoàn.', img: 'anh/khai-giang.jpg', cap: 'Lễ khai giảng' },
+    { year: '1/2026', title: 'Làm việc cùng các đơn vị', text: 'Lớp đến làm việc với các đơn vị thành viên, nghe chia sẻ trực tiếp từ những người đang vận hành từng mắt xích của ngành.', img: 'anh/lam-viec-don-vi.jpg', cap: 'Chương trình làm việc' },
+    { year: '3/2026', title: 'Nhiệt điện Sông Hậu 1', text: 'Chặng đầu của hành trình Tây Nam Bộ. Lần đầu cả lớp thấy công việc của mình “chảy” trong cả chuỗi giá trị.', img: 'anh/song-hau-tap-the.jpg', cap: 'Sông Hậu 1' },
+    { year: '3/2026', title: 'Cụm Khí – Điện – Đạm Cà Mau', text: 'Từ dòng khí đến dòng điện, rồi những bao phân đạm đến tay người nông dân.', img: 'anh/ca-mau.jpg', cap: 'Cà Mau' },
+    { year: 'Đêm nay', title: 'Đêm Gala', text: 'Đêm nay, cả lớp muốn nói với chị một điều: chúng em luôn quý mến và kính trọng chị.', img: 'anh/tiec-lop.jpg', cap: 'PV-NEXT 2025' },
   ],
   timelineDur: 7,       // số giây mỗi mốc
 
   album: [
-    { img: 'https://cdn.petrotimes.vn/stores/news_dataimages/2025/112025/27/17/z7268445289149-1616c10ead2b53cb8d27c81e5c2089e220251127170223.jpg', cap: 'Kho cảng LNG Thị Vải' },
-    { img: 'https://cdn.petrotimes.vn/stores/news_dataimages/2026/032026/31/16/z7646063804007-026ee151599d64ca3c771e61002b039420260331160823.jpg', cap: 'Nhiệt điện Sông Hậu 1' },
-    { img: 'https://cdn.petrotimes.vn/stores/news_dataimages/2025/112025/08/16/z7202550870769-fc5fa7600d090d794229fd55e1af51df20251108165222.jpg', cap: 'Ngày đầu nhập học' },
-    { img: 'https://cdn.petrotimes.vn/stores/news_dataimages/2026/032026/31/16/z7646064166397-79f83a38e426f8a39a80a4faa8308c3020260331160827.jpg', cap: 'Cụm Khí – Điện – Đạm Cà Mau' },
-    { img: 'https://cdn.petrotimes.vn/stores/news_dataimages/2025/112025/27/14/z7267379094208-ce5e194cccf297c3e317d172a20d8c4820251127144759.jpg', cap: 'Trải nghiệm thực tế' },
-    { img: 'https://cdn.petrotimes.vn/stores/news_dataimages/2026/032026/31/16/z7646064485714-5db5a1996fcd849090a0a6d94bbfaa4020260331160829.jpg', cap: 'Đạm Cà Mau' },
-    { img: 'https://cdn.petrotimes.vn/stores/news_dataimages/2025/112025/08/16/z7202550808810-1eccce30a43b7418befebee6dee3d0ab20251108165225.jpg', cap: 'PV College' },
-    { img: 'https://cdn.petrotimes.vn/stores/news_dataimages/2025/112025/27/16/z7268428184037-e9c65ca3c204af6051657f25d64dc43620251127165739.jpg', cap: 'Cả đoàn cùng nhau' },
+    { img: 'anh/chi-lang-nghe.jpg', cap: 'Chăm chú cùng lớp' },
+    { img: 'anh/xe-dien.jpg', cap: 'Lên đường thôi!' },
+    { img: 'anh/chi-va-ban.jpg', cap: 'Bên dòng sông Hậu' },
+    { img: 'anh/cong-truong.jpg', cap: 'Đi thực tế' },
+    { img: 'anh/phong-dieu-khien.jpg', cap: 'Phòng điều khiển' },
+    { img: 'anh/san-khau-hoa.jpg', cap: 'Những bó hoa' },
+    { img: 'anh/hoi-truong.jpg', cap: 'Cả lớp cùng nhau' },
+    { img: 'anh/bua-com.jpg', cap: 'Bữa cơm thân mật' },
   ],
 
-  // Lời nhắn giữ chỗ: thay bằng lời và tên thật của học viên (6 tấm)
+  // Lời nhắn (6 tấm). who: tên người gửi, để '' nếu không ghi tên
   notes: [
-    { text: 'Cảm ơn chị đã tin vào chúng em từ ngày đầu tiên của khóa học.', who: 'Tên học viên' },
-    { text: 'Chuyến đi Tây Nam Bộ là lần đầu em thấy rõ công việc của mình chảy về đâu. Cảm ơn chị.', who: 'Tên học viên' },
-    { text: 'Chị nghiêm khi cần, nhưng lúc nào cũng ấm áp. Em quý chị lắm.', who: 'Tên học viên' },
-    { text: 'Những lời nhắc nhẹ nhàng của chị, em sẽ mang theo trên từng vị trí công việc.', who: 'Tên học viên' },
-    { text: 'Ở PV-NEXT, chị không chỉ là người phụ trách lớp, chị là người chị của cả nhà.', who: 'Tên học viên' },
+    { text: 'Cảm ơn chị đã tin vào chúng em từ ngày đầu tiên của khóa học.', who: '' },
+    { text: 'Chuyến đi Tây Nam Bộ là lần đầu em thấy rõ công việc của mình chảy về đâu. Cảm ơn chị.', who: '' },
+    { text: 'Chị nghiêm khi cần, nhưng lúc nào cũng ấm áp. Em quý chị lắm.', who: '' },
+    { text: 'Những lời nhắc nhẹ nhàng của chị, em sẽ mang theo trên từng vị trí công việc.', who: '' },
+    { text: 'Ở PV-NEXT, chị không chỉ là người phụ trách lớp, chị là người chị của cả nhà.', who: '' },
     { text: 'Cảm ơn chị đã luôn ở bên lớp. Cả lớp quý mến và kính trọng chị.', who: '60 học viên PV-NEXT 2025' },
   ],
 };
@@ -391,14 +432,36 @@ const rots = [-3, 2, -1.5, 3, 2.5, -2, 1.5, -2.5];
 $('#album').innerHTML = CONFIG.album.slice(0, 8).map((a, i) =>
   `<figure class="polaroid a" style="--rot:${rots[i]}deg;--d:${.6 + i * .28}"><div class="im" style="background-image:url('${a.img}')"></div><figcaption>${a.cap}</figcaption></figure>`).join('');
 $('#notes').innerHTML = CONFIG.notes.slice(0, 6).map((n, i) =>
-  `<div class="note a" style="--rot:${rots[i] * .7}deg;--d:${.6 + i * .35}"><p>${n.text}</p><div class="who">${n.who}</div></div>`).join('');
+  `<div class="note a" style="--rot:${rots[i] * .7}deg;--d:${.6 + i * .35}"><p>${n.text}</p>${n.who ? `<div class="who">${n.who}</div>` : ''}</div>`).join('');
 $$('.letter .line').forEach((l, i) => l.style.setProperty('--d', 1.2 + i * 1.25));
+$$('[data-photo]').forEach(el => el.style.backgroundImage = `url('${CONFIG.photos[el.dataset.photo]}')`);
 
 /* ---------- video ---------- */
 const bg = $('#bg'), mem = $('#mem');
 bg.loop = CONFIG.bgLoop;
 if (CONFIG.bgVideo) bg.src = CONFIG.bgVideo;
-if (CONFIG.memoryVideo) mem.src = CONFIG.memoryVideo; else $('.s-video').remove();
+// chuỗi video kỷ niệm: phát lần lượt từng đoạn, mờ chuyển giữa các đoạn
+const clips = Array.isArray(CONFIG.memoryVideo) ? CONFIG.memoryVideo : CONFIG.memoryVideo ? [{ src: CONFIG.memoryVideo }] : [];
+if (!clips.length) $('.s-video').remove();
+let clipIdx = 0, switching = false;
+const inVideo = () => scenes[cur]?.classList.contains('s-video');
+function playClip(i) {
+  clipIdx = i; switching = true;
+  if (i >= clips.length) { switching = false; show(cur + 1); return; }
+  const c = clips[i];
+  mem.classList.add('out');
+  setTimeout(() => {
+    mem.src = c.src;
+    mem.addEventListener('loadedmetadata', () => {
+      mem.currentTime = c.start || 0;
+      mem.play().then(() => { switching = false; mem.classList.remove('out'); }).catch(() => playClip(i + 1));
+    }, { once: true });
+  }, i ? 500 : 0);
+}
+mem.addEventListener('timeupdate', () => {
+  const c = clips[clipIdx];
+  if (inVideo() && !switching && c?.end && mem.currentTime >= c.end) { mem.pause(); playClip(clipIdx + 1); }
+});
 
 const music = CONFIG.music ? new Audio(CONFIG.music) : null;
 if (music) { music.loop = true; music.volume = 0; }
@@ -436,15 +499,15 @@ function schedule() {
 }
 function enter(s) {
   if (s.querySelector('[data-count]')) runCounters(s);
-  if (s.classList.contains('s-video')) { mem.currentTime = 0; mem.play().catch(() => show(cur + 1)); fadeMusic(.1); }
+  if (s.classList.contains('s-video')) { playClip(0); fadeMusic(.1); }
   if (s.classList.contains('s-end')) { confettiOn = true; burstConfetti(); }
 }
 function leave(s) {
   if (s.classList.contains('s-video')) { mem.pause(); fadeMusic(.6); }
   if (s.classList.contains('s-end')) confettiOn = false;
 }
-mem.addEventListener('ended', () => { if (scenes[cur]?.classList.contains('s-video')) show(cur + 1); });
-mem.addEventListener('error', () => { if (scenes[cur]?.classList.contains('s-video')) show(cur + 1); });
+mem.addEventListener('ended', () => { if (inVideo() && !switching) playClip(clipIdx + 1); });
+mem.addEventListener('error', () => { if (inVideo()) playClip(clipIdx + 1); });
 
 function runCounters(s) {
   s.querySelectorAll('[data-count]').forEach(el => {
@@ -573,7 +636,7 @@ addEventListener('mousemove', wake); wake();
 
 /* ---------- tải trước ảnh rồi hiện nút bắt đầu ---------- */
 (function preload() {
-  const urls = [...CONFIG.timeline.map(t => t.img), ...CONFIG.album.map(a => a.img)];
+  const urls = [...Object.values(CONFIG.photos), ...CONFIG.timeline.map(t => t.img), ...CONFIG.album.map(a => a.img)];
   let done = 0; const total = urls.length + 1;
   const bump = () => { done++; $('#lpct').textContent = 'Đang tải… ' + Math.round(done / total * 100) + '%'; };
   const waits = urls.map(u => new Promise(r => { const im = new Image(); im.onload = im.onerror = () => { bump(); r(); }; im.src = u; }));
