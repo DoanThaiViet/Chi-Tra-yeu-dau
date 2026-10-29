@@ -196,6 +196,23 @@ body.paused #pauseTag{display:block}
 #fin{position:fixed;inset:0;z-index:8000;background:#000;opacity:0;pointer-events:none;transition:opacity 3s}
 #fin.on{opacity:1}
 body.rec #hud,body.rec #pauseTag,body.rec #prog{display:none!important}
+
+/* ---------- chế độ in PDF (?pdf=1&bg=ảnh-nền&vid=ảnh-cảnh-video): mỗi cảnh một trang ---------- */
+@media print{@page{size:1920px 1080px;margin:0}}
+html.pdf,html.pdf body{height:auto;overflow:visible;background:#0b0805;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+html.pdf #bgwrap,html.pdf #shade,html.pdf #warm,html.pdf #fx,html.pdf .grain,html.pdf .lbx,html.pdf #prog,html.pdf #hud,html.pdf #pauseTag,html.pdf #fin,html.pdf #loader,html.pdf #burst{display:none!important}
+html.pdf *{transition:none!important;animation:none!important}
+html.pdf .scene,html.pdf #intro{position:relative;inset:auto;display:block;width:1920px;height:1080px;opacity:1;visibility:visible;overflow:hidden;break-after:page;page-break-after:always;clip-path:none;
+  background:linear-gradient(rgba(11,8,5,var(--sh,.4)),rgba(11,8,5,var(--sh,.4))),var(--bgimg) center/cover #0b0805}
+html.pdf #intro{display:flex;background:radial-gradient(ellipse at 50% 55%,#2a1c10,#0b0805 70%)}
+html.pdf .a,html.pdf .s-name .ch,html.pdf .i-a,html.pdf .i-b,html.pdf .i-sub,html.pdf .i-date{opacity:1!important;transform:none;filter:none!important}
+html.pdf .i-line{width:min(70vw,900px)}
+html.pdf .album .a,html.pdf .notes .a{transform:rotate(var(--rot,0deg))}
+html.pdf .letter .line{clip-path:none}
+html.pdf .ph{transform:scale(1.03)}
+html.pdf .s-video{background:#000 var(--vidimg) center/cover no-repeat}
+html.pdf .s-video video{display:none}
+html.pdf .shimmer{background-position:30% 0}
 body.rec,body.rec *{cursor:none!important}
 </style>
 </head>
@@ -642,6 +659,21 @@ addEventListener('mousemove', wake); wake();
   const waits = urls.map(u => new Promise(r => { const im = new Image(); im.onload = im.onerror = () => { bump(); r(); }; im.src = u; }));
   waits.push(new Promise(r => { if (!CONFIG.bgVideo || bg.readyState >= 2) { bump(); r(); } else { bg.addEventListener('loadeddata', () => { bump(); r(); }, { once: true }); bg.addEventListener('error', () => { bump(); r(); }, { once: true }); } }));
   Promise.race([Promise.all(waits), new Promise(r => setTimeout(r, 8000))]).then(() => $('#loader').classList.add('ready'));
+})();
+
+/* ---------- chế độ in PDF: bày mọi cảnh ở trạng thái cuối, mỗi cảnh một trang ---------- */
+(function pdfMode() {
+  const q = new URLSearchParams(location.search);
+  if (!q.has('pdf')) return;
+  const root = document.documentElement;
+  root.classList.add('pdf');
+  root.style.setProperty('--bgimg', `url('${q.get('bg') || ''}')`);
+  root.style.setProperty('--vidimg', `url('${q.get('vid') || ''}')`);
+  scenes[0].before($('#intro'));
+  scenes.forEach(s => { s.classList.add('on'); s.style.setProperty('--sh', s.dataset.shade ?? .4); });
+  $$('[data-count]').forEach(el => el.textContent = el.dataset.count + (el.dataset.suffix || ''));
+  bg.removeAttribute('src'); bg.load();
+  started = true; burstOn = false; confettiOn = false; clearTimeout(timer);
 })();
 </script>
 </body>
