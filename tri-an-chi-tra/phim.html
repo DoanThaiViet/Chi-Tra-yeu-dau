@@ -111,6 +111,14 @@ p.lead{margin-top:22px;font-size:clamp(15px,1.25vw,22px);line-height:1.65;color:
 .s-video .lower{position:absolute;left:6vw;bottom:11vh;z-index:2;font-family:var(--hand);font-size:clamp(26px,2.4vw,44px);color:#f1d4a8;text-shadow:0 2px 20px rgba(0,0,0,.7)}
 .s-video video{transition:opacity .5s}
 .s-video video.out{opacity:0}
+.s-video .vcard{position:absolute;inset:0;z-index:3;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:0 8vw;
+  background:radial-gradient(ellipse at 50% 55%,#2a1c10,#0b0805 70%);opacity:0;transition:opacity 1s ease;pointer-events:none}
+.s-video .vcard.on{opacity:1}
+.s-video .vcard .over{justify-content:center}.s-video .vcard .over:empty{display:none}
+.s-video .vcard .over:after{content:"";width:34px;height:1px;background:var(--gold-hi)}
+.s-video .vcard h2{font-size:clamp(56px,6.2vw,118px);transform:translateY(20px);transition:transform 1.6s cubic-bezier(.2,.7,.2,1)}
+.s-video .vcard.on h2{transform:none}
+.s-video .vcard .hand{margin-top:3.5vh;font-family:var(--hand);font-size:clamp(28px,2.6vw,48px);color:#f1d4a8}
 
 /* album */
 .s-album .head{position:absolute;left:0;right:0;top:9vh;text-align:center}
@@ -309,7 +317,8 @@ body.rec,body.rec *{cursor:none!important}
 
 <section class="scene s-video" data-wait="video" data-shade="1">
   <video id="mem" playsinline preload="auto"></video>
-  <div class="lower a" style="--d:1">Những khoảnh khắc của chị cùng lớp</div>
+  <div class="lower a" style="--d:1" id="lowerCap"></div>
+  <div class="vcard" id="vcard"><div class="over"></div><h2></h2><div class="hand"></div></div>
 </section>
 
 <section class="scene s-notes" data-dur="12" data-shade=".8">
@@ -363,10 +372,17 @@ const CONFIG = {
   bgRate: 0.5,          // tốc độ phát video nền: 0.5 = chậm một nửa
   bgLoop: false,        // false: phát một lần rồi giữ khung cuối (hoa nở hẳn); true: lặp lại
 
-  // Chuỗi video phát toàn màn hình giữa phim (start/end: giây cắt đoạn, bỏ trống = cả video).
+  // Chuỗi video phát toàn màn hình giữa phim, chạy lần lượt từ trên xuống.
+  //   video:    { src, start, end, cap }  (start/end: giây cắt đoạn; cap: dòng chữ nhỏ góc dưới)
+  //   thẻ chữ:  { title, sub, over, dur } (màn chữ chuyển cảnh, dur: số giây hiện)
   // Để [] để bỏ cảnh này.
   memoryVideo: [
-    { src: 'video/chi-phat-bieu.mp4', end: 12 },   // từ C1602.MP4 (H.264, 25 khung/giây), dừng ở câu "đơn vị chúng ta"
+    { src: 'video/chi-phat-bieu.mp4', end: 12, cap: 'Những khoảnh khắc của chị cùng lớp' },   // từ C1602.MP4, dừng ở câu "đơn vị chúng ta"
+    { over: 'PETROVIETNAM-NEXT 2025', title: 'Những lời <em>yêu thương</em><br>của cả lớp', sub: 'Gửi tới chị Trà', dur: 5 },
+    { src: 'video/loi-nhan-1.mp4' },
+    { src: 'video/loi-nhan-2.mp4' },
+    { src: 'video/loi-nhan-3.mp4' },
+    { src: 'video/loi-nhan-4.mp4' },
   ],
 
   // Ảnh của chị ở các cảnh: chân dung, câu trích dẫn, bài học
@@ -460,12 +476,29 @@ const clips = Array.isArray(CONFIG.memoryVideo) ? CONFIG.memoryVideo : CONFIG.me
 if (!clips.length) $('.s-video').remove();
 let clipIdx = 0, switching = false;
 const inVideo = () => scenes[cur]?.classList.contains('s-video');
+const vcard = $('#vcard'), lowerCap = $('#lowerCap');
+let clipToken = 0;
 function playClip(i) {
   clipIdx = i; switching = true;
-  if (i >= clips.length) { switching = false; show(cur + 1); return; }
+  const token = ++clipToken;
+  if (i >= clips.length) { switching = false; vcard.classList.remove('on'); show(cur + 1); return; }
   const c = clips[i];
   mem.classList.add('out');
+  lowerCap.textContent = c.cap || '';
+  if (c.title) {                                   // thẻ chữ chuyển cảnh giữa các đoạn video
+    mem.pause();
+    vcard.querySelector('.over').textContent = c.over || '';
+    vcard.querySelector('h2').innerHTML = c.title;
+    vcard.querySelector('.hand').textContent = c.sub || '';
+    vcard.classList.add('on');
+    fadeMusic(.5, 1200);                           // nhạc lên trong lúc hiện chữ
+    setTimeout(() => { if (token === clipToken && inVideo()) playClip(i + 1); }, (c.dur || 5) * 1000);
+    return;
+  }
+  vcard.classList.remove('on');
+  fadeMusic(.04, 800);                             // nhạc nhỏ lại để nghe rõ lời trong video
   setTimeout(() => {
+    if (token !== clipToken) return;
     mem.src = c.src;
     mem.addEventListener('loadedmetadata', () => {
       mem.currentTime = c.start || 0;
@@ -518,7 +551,7 @@ function enter(s) {
   if (s.classList.contains('s-end')) { confettiOn = true; burstConfetti(); }
 }
 function leave(s) {
-  if (s.classList.contains('s-video')) { mem.pause(); fadeMusic(.6); }
+  if (s.classList.contains('s-video')) { clipToken++; mem.pause(); vcard.classList.remove('on'); fadeMusic(.6); }
   if (s.classList.contains('s-end')) confettiOn = false;
 }
 mem.addEventListener('ended', () => { if (inVideo() && !switching) playClip(clipIdx + 1); });
