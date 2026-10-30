@@ -484,13 +484,13 @@ const CONFIG = {
   memoryVideo: [
     { src: 'video/chi-phat-bieu.mp4', end: 12, cap: 'Những khoảnh khắc của chị cùng lớp' },   // từ C1602.MP4, dừng ở câu "đơn vị chúng ta"
     { over: 'PETROVIETNAM-NEXT 2025', title: 'Những lời <em>yêu thương</em><br>của cả lớp', sub: 'Gửi tới chị Trà', dur: 5 },
-    { src: 'video/loi-nhan-5.mp4' },   // bạn trai (32 giây)
-    { src: 'video/loi-nhan-6.mp4' },   // bạn nữ (30 giây)
+    { src: 'video/loi-nhan-5.mp4', audio: 'video/loi-nhan-5-tieng.wav' },   // bạn trai (32 giây), tiếng gốc nhỏ nên dùng bản tăng x3,5
+    { src: 'video/loi-nhan-6.mp4', audio: 'video/loi-nhan-6-tieng.wav' },   // bạn nữ (30 giây), bản tăng x3,2
     { src: 'video/loi-nhan-3.mp4' },   // nhóm 2 bạn
     { src: 'video/loi-nhan-4.mp4' },   // nhóm 3 bạn
     { src: 'video/loi-nhan-7.mp4' },   // nhóm 3 bạn nữ (IMG_3984)
-    { src: 'video/loi-nhan-1.mp4' },   // cả lớp
-    { src: 'video/loi-nhan-2.mp4' },   // cả lớp
+    { src: 'video/loi-nhan-1.mp4', volume: .3 },   // cả lớp (tiếng gốc to, giảm còn 30%)
+    { src: 'video/loi-nhan-2.mp4', volume: .35 },  // cả lớp (giảm còn 35%)
   ],
 
   // Ảnh của chị ở các cảnh: chân dung, câu trích dẫn, bài học
@@ -534,7 +534,7 @@ const CONFIG = {
     { text: 'Chị nghiêm khi cần, nhưng lúc nào cũng ấm áp. Em quý chị lắm.', who: '' },
     { text: 'Những lời nhắc nhẹ nhàng của chị, em sẽ mang theo trên từng vị trí công việc.', who: '' },
     { text: 'Ở PETROVIETNAM-NEXT, chị không chỉ là người phụ trách lớp, chị là người chị của cả nhà.', who: '' },
-    { text: 'Cảm ơn chị đã luôn ở bên lớp. Cả lớp kính trọng và quý mến chị.', who: '60 học viên PETROVIETNAM-NEXT 2025' },
+    { text: 'Chúng em cảm ơn chị Trà vì sự tận tâm, nhiệt huyết và những giá trị ý nghĩa mà chị đã luôn lan tỏa đến chúng em.', who: '60 học viên PETROVIETNAM-NEXT 2025' },
   ],
 };
 
@@ -602,14 +602,19 @@ function playClip(i) {
     vcard.querySelector('h2').innerHTML = c.title;
     vcard.querySelector('.hand').textContent = c.sub || '';
     vcard.classList.add('on');
-    fadeMusic(.5, 1200);                           // nhạc lên trong lúc hiện chữ
+    voice.pause();
+    fadeMusic(.5, 1200);                           // nhạc chỉ vang trong lúc hiện chữ
     setTimeout(() => { if (token === clipToken && inVideo()) playClip(i + 1); }, (c.dur || 5) * 1000);
     return;
   }
   vcard.classList.remove('on');
-  fadeMusic(.04, 800);                             // nhạc nhỏ lại để nghe rõ lời trong video
+  fadeMusic(0, 800);                               // video phát thì tắt nhạc
   setTimeout(() => {
     if (token !== clipToken) return;
+    // c.audio: bản tiếng đã tăng âm lượng, phát khớp hình (tiếng gốc của video tắt); c.volume: chỉnh to/nhỏ (tối đa 1)
+    voice.pause();
+    if (c.audio) { voice.src = c.audio; voice.volume = c.volume ?? 1; mem.muted = true; }
+    else { voice.removeAttribute('src'); mem.muted = false; mem.volume = c.volume ?? 1; }
     mem.src = c.src;
     mem.addEventListener('loadedmetadata', () => {
       mem.currentTime = c.start || 0;
@@ -619,8 +624,20 @@ function playClip(i) {
 }
 mem.addEventListener('timeupdate', () => {
   const c = clips[clipIdx];
-  if (inVideo() && !switching && c?.end && mem.currentTime >= c.end) { mem.pause(); playClip(clipIdx + 1); }
+  if (inVideo() && !switching && c?.end && mem.currentTime >= c.end) { mem.pause(); playClip(clipIdx + 1); return; }
+  syncVoice(false);
 });
+
+// bản tiếng rời chạy theo video: cùng phát, cùng dừng, chỉnh lại nếu lệch quá 0,12 giây
+const voice = new Audio(); voice.preload = 'auto';
+const voiceClip = () => (inVideo() && clips[clipIdx]?.audio) ? clips[clipIdx] : null;
+function syncVoice(force) {
+  if (!voiceClip() || mem.paused) return;
+  if (force || Math.abs(voice.currentTime - mem.currentTime) > 0.12) voice.currentTime = mem.currentTime;
+}
+mem.addEventListener('playing', () => { if (voiceClip()) { voice.currentTime = mem.currentTime; voice.play().catch(() => {}); } });
+mem.addEventListener('pause', () => voice.pause());
+mem.addEventListener('seeked', () => syncVoice(true));
 
 const music = CONFIG.music ? new Audio(CONFIG.music) : null;
 if (music) {
@@ -668,7 +685,7 @@ function schedule() {
 }
 function enter(s) {
   if (s.querySelector('[data-count]')) runCounters(s);
-  if (s.classList.contains('s-video')) { playClip(0); fadeMusic(.04); }   // nhạc gần như tắt để nghe rõ giọng chị
+  if (s.classList.contains('s-video')) { playClip(0); fadeMusic(0); }   // video phát thì tắt nhạc
   if (s.classList.contains('s-end')) { confettiOn = true; burstConfetti(); }
 }
 function leave(s) {
