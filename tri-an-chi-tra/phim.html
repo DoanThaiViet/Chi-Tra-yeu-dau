@@ -623,6 +623,18 @@ function playClip(i) {
     }, { once: true });
   }, i ? 500 : 0);
 }
+// điện thoại (iPhone, Zalo) đôi khi không trả kết quả play() hoặc không báo 'ended' → tự kiểm tra mỗi giây
+mem.addEventListener('playing', () => { if (inVideo() && !clips[clipIdx]?.title) { switching = false; mem.classList.remove('out'); } });
+let wdLast = -1, wdStill = 0;
+setInterval(() => {
+  const c = clips[clipIdx];
+  if (!started || paused || !inVideo() || !c || c.title) { wdStill = 0; return; }
+  const t = mem.currentTime;
+  wdStill = Math.abs(t - wdLast) < .05 ? wdStill + 1 : 0; wdLast = t;
+  const endAt = c.end || mem.duration;
+  const atEnd = mem.ended || (endAt > 0 && t >= endAt - .3);
+  if ((atEnd && wdStill >= 2) || wdStill >= 10) { wdStill = 0; mem.pause(); playClip(clipIdx + 1); }
+}, 1000);
 mem.addEventListener('timeupdate', () => {
   const c = clips[clipIdx];
   if (inVideo() && !switching && c?.end && mem.currentTime >= c.end) { mem.pause(); playClip(clipIdx + 1); return; }
