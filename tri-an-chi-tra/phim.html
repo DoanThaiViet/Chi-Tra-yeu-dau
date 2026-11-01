@@ -203,6 +203,7 @@ p.lead{margin-top:22px;font-size:clamp(15px,1.25vw,22px);line-height:1.65;color:
 #hud button:hover,#hud button:focus-visible{background:rgba(233,201,154,.18);color:#fff}
 #hud button:active{background:rgba(233,201,154,.32)}
 #hud button.off{opacity:.45}
+#hud i{display:none;font-style:normal;font-size:20px;line-height:1;min-width:22px;text-align:center}
 body.idle #hud{opacity:0;pointer-events:none}
 @media (hover:none){#hud{bottom:7vh;font-size:14px}#hud button{padding:12px 16px}}
 #pauseTag{position:fixed;top:8vh;right:3vw;z-index:60;font-size:10px;letter-spacing:.3em;color:var(--gold-hi);background:rgba(20,14,8,.6);padding:7px 14px;border-radius:999px;display:none}
@@ -210,6 +211,104 @@ body.paused #pauseTag{display:block}
 #fin{position:fixed;inset:0;z-index:8000;background:#000;opacity:0;pointer-events:none;transition:opacity 3s}
 #fin.on{opacity:1}
 body.rec #hud,body.rec #pauseTag,body.rec #prog{display:none!important}
+
+/* ---------- điện thoại dọc: ảnh trên – chữ dưới, cỡ chữ theo chiều ngang ---------- */
+@media (orientation:portrait) and (max-aspect-ratio:4/5){
+  .lbx{height:2.5vh}
+  #bg{object-position:center 40%}
+  .over{font-size:10px;letter-spacing:.3em;gap:10px;margin-bottom:12px}
+  .over:before,.center .over:after{width:22px}
+  p.lead{font-size:clamp(14px,3.9vw,18px);margin-top:14px;line-height:1.55}
+  .left{left:7vw;width:86vw!important}
+  .center{width:88vw}
+
+  /* tên */
+  .s-name .left{bottom:14vh!important}
+  .s-name h2{font-size:clamp(40px,12.5vw,72px);line-height:1.08}
+  .s-name .fade{background:linear-gradient(0deg,rgba(11,8,5,.85),rgba(11,8,5,.2) 60%,transparent)}
+
+  /* chân dung */
+  .ph{inset:-3%}
+  .s-portrait .cap{right:7vw;left:7vw;bottom:10vh}
+  .s-portrait .cap .hand{font-size:clamp(34px,10vw,54px)}
+  .s-portrait .cap .sm{font-size:10px;letter-spacing:.3em}
+
+  /* nửa ảnh – nửa chữ → ảnh nửa trên, chữ nửa dưới */
+  .split .side{width:100%;height:56%;top:0;bottom:auto}
+  .split .side.l,.split .side.r{left:0;right:0;-webkit-mask-image:linear-gradient(0deg,transparent,#000 38%);mask-image:linear-gradient(0deg,transparent,#000 38%)}
+  .split .side .ph{inset:-4%}
+  .split .txt,.split .txt.l,.split .txt.r{left:7vw;right:7vw;width:auto!important;top:auto;bottom:7vh;transform:none;text-align:left}
+  .s-quote .mark{font-size:84px;height:.38em}
+  .s-quote.split blockquote{font-size:clamp(21px,6.2vw,30px);line-height:1.3}
+  .s-quote .by{margin-top:16px;font-size:10px;letter-spacing:.2em}
+  .s-lessons h2{font-size:clamp(28px,8.4vw,42px)}
+  .gifts{margin-top:2vh}
+  .gifts li{font-size:clamp(14px,4vw,18px);padding:1.4vh 0;gap:14px}
+  .gifts li b{min-width:28px}
+
+  /* con số: lưới 2 × 2 */
+  .s-stats h2{font-size:clamp(30px,9vw,46px)}
+  .stats{grid-template-columns:1fr 1fr;margin-top:4vh}
+  .stats div{padding:2.6vh 3vw;border-bottom:1px solid rgba(233,201,154,.18)}
+  .stats div:nth-child(2n){border-right:0}
+  .stats div:nth-child(n+3){border-bottom:0}
+  .stats b{font-size:clamp(44px,14vw,72px)}
+  .stats span{font-size:clamp(11px,3.3vw,14px);margin-top:8px}
+
+  /* mốc thời gian: chữ dồn xuống dưới, phủ tối từ dưới lên */
+  .s-tl .fade{background:linear-gradient(0deg,rgba(11,8,5,.95) 0%,rgba(11,8,5,.75) 42%,rgba(11,8,5,.05) 75%)}
+  .s-tl .left{top:auto;bottom:8vh;transform:none}
+  .s-tl .yr{font-size:clamp(46px,14vw,72px)}
+  .s-tl h2{font-size:clamp(26px,7.6vw,38px);margin-top:6px}
+  .s-tl .cap{right:auto;left:7vw;top:8vh;bottom:auto;font-size:clamp(20px,6vw,28px)}
+  .scene.on .ph{transform:scale(1.04)}
+
+  /* album: 2 cột × 4 hàng */
+  .s-album .head,.s-notes .head{top:6vh}
+  .s-album h2,.s-notes h2{font-size:clamp(30px,9vw,44px)}
+  .album{left:6vw;right:6vw;top:19vh;bottom:5vh;grid-template-columns:1fr 1fr;grid-template-rows:repeat(4,1fr);gap:3.2vw 4.5vw}
+  .polaroid{padding:1.6vw 1.6vw 7vw}
+  .polaroid figcaption{bottom:1.4vw;font-size:clamp(12px,3.6vw,16px)}
+
+  /* lá thư: một cột */
+  .s-letter .wrap{grid-template-columns:1fr;grid-template-rows:auto 1fr;gap:3vh;padding:6vh 6vw;align-items:start;align-content:center}
+  .s-letter h2{font-size:clamp(30px,9vw,44px)}
+  .s-letter .wrap > div:first-child .lead{display:none}
+  .letter{padding:6vw 5vw 5vw 9vw;background-image:none}
+  .letter:before{left:5vw}
+  .letter .line{font-size:clamp(15px,4.4vw,20px);line-height:1.35;padding:.2em 0}
+  .letter .sign{font-size:clamp(20px,6vw,28px);margin-top:10px}
+
+  /* video */
+  .s-video .lower{left:6vw;right:6vw;bottom:9vh;font-size:clamp(20px,6vw,28px)}
+  .s-video .vcard h2{font-size:clamp(36px,11vw,58px)}
+  .s-video .vcard .hand{font-size:clamp(22px,6.5vw,32px)}
+
+  /* lời nhắn: 2 cột × 3 hàng */
+  .notes{left:5vw;right:5vw;top:18vh;bottom:5vh;grid-template-columns:1fr 1fr;grid-template-rows:repeat(3,1fr);gap:5vw 4vw}
+  .note{padding:5vw 4vw 4vw}
+  .note p{font-size:clamp(14px,4vw,19px);line-height:1.28}
+  .note .who{font-size:9px;letter-spacing:.15em;margin-top:6px}
+
+  /* kết */
+  .s-end h2{font-size:clamp(54px,17vw,96px)}
+  .s-end .hand{font-size:clamp(22px,6.4vw,32px);margin-top:4vh}
+  .s-end .sig{font-size:10px;letter-spacing:.25em;line-height:1.8}
+
+  /* intro */
+  .i-date{font-size:10px;letter-spacing:.35em;padding:0 6vw;line-height:1.8}
+  .i-a{font-size:clamp(48px,15vw,80px)}
+  .i-b{font-size:clamp(76px,24vw,130px)}
+  .i-sub{font-size:clamp(20px,6vw,30px);padding:0 6vw}
+  #loader .mark{font-size:46px}
+
+  /* thanh điều khiển gọn */
+  #hud{bottom:4vh;gap:2px;padding:4px;max-width:94vw}
+  #hud kbd,#hud span{display:none}
+  #hud i{display:block}
+  #hud button{padding:10px 16px}
+  #pauseTag{top:5vh}
+}
 
 /* ---------- chế độ in PDF (?pdf=1&bg=ảnh-nền&vid=ảnh-cảnh-video): mỗi cảnh một trang ---------- */
 @media print{@page{size:1920px 1080px;margin:0}}
@@ -348,7 +447,7 @@ body.rec,body.rec *{cursor:none!important}
 <div class="lbx t"></div><div class="lbx b"></div>
 <div id="prog"></div>
 <div id="pauseTag">TẠM DỪNG</div>
-<div id="hud"><button data-act="prev"><kbd>←</kbd>Cảnh trước</button><button data-act="pause"><kbd>Space</kbd>Dừng / chạy</button><button data-act="next"><kbd>→</kbd>Cảnh tiếp</button><button data-act="fs"><kbd>F</kbd>Toàn màn hình</button><button data-act="music"><kbd>M</kbd>Nhạc</button></div>
+<div id="hud"><button data-act="prev" aria-label="Cảnh trước"><kbd>←</kbd><i>‹</i><span>Cảnh trước</span></button><button data-act="pause" aria-label="Dừng / chạy"><kbd>Space</kbd><i>❚❚</i><span>Dừng / chạy</span></button><button data-act="next" aria-label="Cảnh tiếp"><kbd>→</kbd><i>›</i><span>Cảnh tiếp</span></button><button data-act="fs" aria-label="Toàn màn hình"><kbd>F</kbd><i>⛶</i><span>Toàn màn hình</span></button><button data-act="music" aria-label="Nhạc"><kbd>M</kbd><i>♪</i><span>Nhạc</span></button></div>
 <div id="fin"></div>
 
 <div id="intro">
@@ -401,6 +500,8 @@ const CONFIG = {
   },
 
   music: 'nhac/all-out-of-love.mp3',   // nhạc nền (không đưa lên GitHub, xem .gitignore)
+  musicFallback: 'am-thanh/gui-chi-piano.mp3',   // bản piano sáng tác riêng, dùng khi không có file trên
+
   fullscreenOnStart: true,
 
   // Ảnh của lớp (đã thu nhỏ từ thư mục Mdm Tea)
@@ -521,7 +622,17 @@ mem.addEventListener('timeupdate', () => {
 });
 
 const music = CONFIG.music ? new Audio(CONFIG.music) : null;
-if (music) { music.loop = true; music.volume = 0; }
+if (music) {
+  music.loop = true; music.volume = 0;
+  // không có file nhạc trên máy (vd. GitHub Pages) → tự chuyển sang bản piano sáng tác riêng
+  let fellBack = false;
+  music.addEventListener('error', () => {
+    if (fellBack || !CONFIG.musicFallback) return;
+    fellBack = true; music.src = CONFIG.musicFallback; music.load();
+    if (started && !$('#hud [data-act="music"]').classList.contains('off'))
+      music.play().then(() => { if (music.volume < .05 && !inVideo()) fadeMusic(.6, 2500); }).catch(() => {});
+  });
+}
 function fadeMusic(to, ms = 1500) {
   if (!music) return;
   const from = music.volume, st = performance.now();

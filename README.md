@@ -6,7 +6,7 @@ Phim tự chạy (khoảng 2,5 phút) do lớp **Lãnh đạo tương lai Petrov
 
 - **Cách dễ nhất (USB, không cần mạng, không cần cài gì):** chép cả thư mục vào USB, sang máy khác bấm đúp `MO-PHIM.html`. Trang mở bằng Chrome hoặc Edge; font, ảnh, video và nhạc đều nằm sẵn trong thư mục. Nếu máy mở bằng trình duyệt khác, chuột phải `MO-PHIM.html` → *Open with* → Chrome hoặc Edge.
 - **Trên máy có PowerShell:** bấm đúp `MO-PHIM.bat` (chạy qua máy chủ cục bộ cổng 8765).
-- **Trên GitHub Pages:** bật Pages cho repo (nhánh `main`, thư mục gốc). Trang chủ tự chuyển vào `tri-an-chi-tra/phim.html`. Bản trên GitHub không có nhạc nền (file nhạc có bản quyền, chỉ để trên máy).
+- **Trên GitHub Pages:** bật Pages cho repo (nhánh `main`, thư mục gốc). Trang chủ tự chuyển vào `tri-an-chi-tra/phim.html`. Bản trên GitHub tự phát bản piano sáng tác riêng `am-thanh/gui-chi-piano.mp3`; khi chạy trên máy có file `nhac/all-out-of-love.mp3` thì phát bài đó. Xem tốt trên điện thoại cả màn ngang lẫn màn dọc.
 
 Bấm nút phát hoặc nhấn một phím bất kỳ để bắt đầu.
 
@@ -34,6 +34,7 @@ tri-an-chi-tra/
   anh/               ảnh đã thu nhỏ (cạnh dài 2400 px)
   video/             video nền hoa nở (CC0) và đoạn video chị phát biểu (MP4)
   nhac/              nhạc nền (chỉ trên máy, không đưa lên GitHub)
+  am-thanh/          nhạc piano sáng tác riêng, dùng khi không có file trong nhac/
 ```
 
 ## Chỉnh nội dung
