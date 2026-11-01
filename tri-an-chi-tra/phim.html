@@ -481,16 +481,17 @@ const CONFIG = {
   //   video:    { src, start, end, cap }  (start/end: giây cắt đoạn; cap: dòng chữ nhỏ góc dưới)
   //   thẻ chữ:  { title, sub, over, dur } (màn chữ chuyển cảnh, dur: số giây hiện)
   // Để [] để bỏ cảnh này.
+  // Tiếng các video đã cân sẵn trong file (-16 LUFS) nên không cần audio/volume; vẫn dùng được nếu thêm video mới.
   memoryVideo: [
     { src: 'video/chi-phat-bieu.mp4', end: 12, cap: 'Những khoảnh khắc của chị cùng lớp' },   // từ C1602.MP4, dừng ở câu "đơn vị chúng ta"
     { over: 'PETROVIETNAM-NEXT 2025', title: 'Những lời <em>yêu thương</em><br>của cả lớp', sub: 'Gửi tới chị Trà', dur: 5 },
-    { src: 'video/loi-nhan-5.mp4', audio: 'video/loi-nhan-5-tieng.wav' },   // bạn trai (32 giây), tiếng gốc nhỏ nên dùng bản tăng x3,5
-    { src: 'video/loi-nhan-6.mp4', audio: 'video/loi-nhan-6-tieng.wav' },   // bạn nữ (30 giây), bản tăng x3,2
+    { src: 'video/loi-nhan-5.mp4' },   // bạn trai (32 giây)
+    { src: 'video/loi-nhan-6.mp4' },   // bạn nữ (30 giây)
     { src: 'video/loi-nhan-3.mp4' },   // nhóm 2 bạn
     { src: 'video/loi-nhan-4.mp4' },   // nhóm 3 bạn
     { src: 'video/loi-nhan-7.mp4' },   // nhóm 3 bạn nữ (IMG_3984)
-    { src: 'video/loi-nhan-1.mp4', volume: .3 },   // cả lớp (tiếng gốc to, giảm còn 30%)
-    { src: 'video/loi-nhan-2.mp4', volume: .35 },  // cả lớp (giảm còn 35%)
+    { src: 'video/loi-nhan-1.mp4' },   // cả lớp
+    { src: 'video/loi-nhan-2.mp4' },   // cả lớp
   ],
 
   // Ảnh của chị ở các cảnh: chân dung, câu trích dẫn, bài học
@@ -651,8 +652,15 @@ if (music) {
       music.play().then(() => { if (music.volume < .05 && !inVideo()) fadeMusic(.6, 2500); }).catch(() => {});
   });
 }
+// iPhone/iPad không cho web chỉnh âm lượng (volume luôn = 1) → khi cần nhỏ nhạc thì tạm dừng hẳn
+const canSetVolume = (() => { try { const a = new Audio(); a.volume = .5; return Math.abs(a.volume - .5) < .01; } catch (e) { return true; } })();
 function fadeMusic(to, ms = 1500) {
   if (!music) return;
+  if (!canSetVolume) {
+    if (to < .1) music.pause();
+    else if (started && !$('#hud [data-act="music"]').classList.contains('off')) music.play().catch(() => {});
+    return;
+  }
   const from = music.volume, st = performance.now();
   (function f(n) { const k = clamp((n - st) / ms, 0, 1); music.volume = lerp(from, to, k); if (k < 1) requestAnimationFrame(f); })(st);
 }
